@@ -33,20 +33,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthActionImpl @Inject()(override val authConnector: AuthConnector)(implicit ec: ExecutionContext)
   extends AuthAction with AuthorisedFunctions {
 
-  override def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]): Future[Result] = {
+  override def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
 
-    authorised().retrieve(Retrievals.externalId) {
-      _.map {
-        externalId => block(AuthenticatedRequest(request, externalId))
-      }.getOrElse(throw new UnauthorizedException("Unable to retrieve external Id"))
+    authorised() {
+      block(AuthenticatedRequest(request))
     } recover {
       case _: NoActiveSession => Unauthorized("not authenticated")
-      case _: InsufficientEnrolments => Forbidden("not authorised")
-      case _: InsufficientConfidenceLevel => Forbidden("not authorised")
-      case _: UnsupportedAuthProvider => Forbidden("not authorised")
-      case _: UnsupportedAffinityGroup => Forbidden("not authorised")
-      case _: UnsupportedCredentialRole => Forbidden("not authorised")
+      case _: AuthorisationException => Forbidden("not authorised")
     }
   }
 }
