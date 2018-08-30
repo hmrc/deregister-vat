@@ -16,7 +16,6 @@
 
 package base
 
-import org.scalatest.Matchers
 import org.scalatestplus.play.guice._
 import play.api.inject.Injector
 import play.api.mvc.AnyContentAsEmpty

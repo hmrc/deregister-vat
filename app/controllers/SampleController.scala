@@ -16,9 +16,8 @@
 
 package controllers
 
-import javax.inject.{Inject, Singleton}
-
 import controllers.actions.AuthAction
+import javax.inject.{Inject, Singleton}
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
 
