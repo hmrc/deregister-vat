@@ -54,12 +54,12 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-play-25" % "1.3.0"
+  "uk.gov.hmrc" %% "bootstrap-play-25" % "3.1.0"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % scope,
-  "org.scalatest" %% "scalatest" % "3.0.0" % scope,
+  "org.scalatest" %% "scalatest" % "3.0.4" % scope,
   "org.pegdown" % "pegdown" % "1.6.0" % scope,
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
   "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
