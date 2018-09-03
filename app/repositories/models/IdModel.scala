@@ -28,5 +28,3 @@ object IdModel {
 
   implicit val formats: OFormat[IdModel] = Json.format[IdModel]
 }
-
-
