@@ -23,7 +23,7 @@ import play.api.http.Status._
 import play.api.mvc.Result
 import play.api.mvc.Results._
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.{Enrolment, InsufficientEnrolments}
+import uk.gov.hmrc.auth.core.{Enrolment, InsufficientEnrolments, MissingBearerToken}
 
 import scala.concurrent.Future
 
@@ -44,7 +44,7 @@ class VatAuthorisedSpec extends MockAuthConnector {
 
   "The VatAuthorised.async method" should {
 
-    "For a User" when {
+    "For a Principal User" when {
 
       "an authorised result is returned from the Auth Connector" should {
 
@@ -53,18 +53,9 @@ class VatAuthorisedSpec extends MockAuthConnector {
           status(result) shouldBe OK
         }
       }
-
-      "an authorisation exception is returned from the Auth Connector" should {
-
-        "Return a forbidden response" in {
-          mockAuthorise(authPredicate, retrievals)(Future.failed(InsufficientEnrolments()))
-          status(result) shouldBe FORBIDDEN
-        }
-      }
     }
 
-
-    "For an Agent" when {
+    "For an Agent User" when {
 
       "they are Signed Up to MTD VAT" should {
 
@@ -73,8 +64,19 @@ class VatAuthorisedSpec extends MockAuthConnector {
           status(result) shouldBe OK
         }
       }
+    }
 
-      "they are NOT Signed Up to MTD VAT" should {
+    "For any type of user" when {
+
+      "a NoActiveSession exception is returned from the Auth Connector" should {
+
+        "Return a unauthorised response" in {
+          mockAuthorise(authPredicate, retrievals)(Future.failed(MissingBearerToken()))
+          status(result) shouldBe UNAUTHORIZED
+        }
+      }
+
+      "an InsufficientAuthority exception is returned from the Auth Connector" should {
 
         "Return a forbidden response" in {
           mockAuthorise(authPredicate, retrievals)(Future.failed(InsufficientEnrolments()))
