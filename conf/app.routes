@@ -1,3 +1,7 @@
 # microservice specific routes
 
-GET        /hello-world        controllers.SampleController.index
+DELETE      /data/:vrn             controllers.DataController.removeAll(vrn: String)
+
+POST        /data/:vrn/:key        controllers.DataController.storeData(vrn: String, key: String)
+GET         /data/:vrn/:key        controllers.DataController.getData(vrn: String, key: String)
+DELETE      /data/:vrn/:key        controllers.DataController.removeData(vrn: String, key: String)

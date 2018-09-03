@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package base
+package config
 
-import org.scalatestplus.play.guice._
-import play.api.inject.Injector
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
-import uk.gov.hmrc.play.test.UnitSpec
+object Constants {
+  val MtdVatEnrolmentKey: String = "HMRC-MTD-VAT"
+  val MtdVatReferenceKey: String = "VRN"
+  val MtdVatDelegatedAuth: String = "mtd-vat-auth"
 
-trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
-
-  def injector: Injector = app.injector
-
-  def fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
-
+  val AgentServicesEnrolment: String = "HMRC-AS-AGENT"
+  val AgentServicesReference: String = "AgentReferenceNumber"
 }

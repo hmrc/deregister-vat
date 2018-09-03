@@ -16,13 +16,17 @@
 
 package repositories.models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Json, OFormat}
 
 case class IdModel(vrn: String,
                    key: String)
 
 object IdModel {
-  implicit val formats: Format[IdModel] = Json.format[IdModel]
+
+  val vrn = "vrn"
+  val key = "key"
+
+  implicit val formats: OFormat[IdModel] = Json.format[IdModel]
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package config
 
-import models.requests.AuthenticatedRequest
-import play.api.mvc.{Request, Result}
+import javax.inject.{Inject, Singleton}
+import play.api.Mode.Mode
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.play.config.ServicesConfig
 
-import scala.concurrent.Future
+@Singleton
+class AppConfig @Inject()(val runModeConfiguration: Configuration, environment: Environment) extends ServicesConfig {
+  override protected def mode: Mode = environment.mode
 
-object FakeAuthAction extends AuthAction {
-  override def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]): Future[Result] =
-    block(AuthenticatedRequest(request))
+  lazy val timeToLiveSeconds: Long = getString("mongodb.timeToLiveSeconds").toLong
+
 }

@@ -16,24 +16,60 @@
 
 package repositories
 
+import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import play.modules.reactivemongo.MongoDbConnection
-import reactivemongo.api.commands._
-import repositories.models.{DataModel, IdModel}
+import play.api.libs.json.{Format, Json}
+import play.modules.reactivemongo.ReactiveMongoComponent
+import reactivemongo.api.commands.UpdateWriteResult
+import reactivemongo.api.indexes.IndexType.Ascending
+import reactivemongo.api.indexes.{Index, IndexType}
+import reactivemongo.bson.BSONDocument
+import repositories.models._
+import reactivemongo.play.json._
+import uk.gov.hmrc.mongo.ReactiveRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class DataRepository @Inject()() extends MongoDbConnection {
+class DataRepository @Inject()(mongo: ReactiveMongoComponent,
+                               appConfig: AppConfig)(implicit ec: ExecutionContext)
+  extends ReactiveRepository[DataModel, IdModel](
+    "deregData",
+    mongo.mongoConnector.db,
+    implicitly[Format[DataModel]],
+    implicitly[Format[IdModel]]
+  ) {
 
-  def apply(): DeregisterVatRepositories[DataModel, IdModel] = new DeregisterVatRepository() {
+  val creationTimestampKey = "creationTimestamp"
 
-    override def removeAll()(implicit ec: ExecutionContext): Future[WriteResult] = removeAll(WriteConcern.Acknowledged)
+  private lazy val ttlIndex = Index(
+    Seq((creationTimestampKey, IndexType(Ascending.value))),
+    name = Some("deregDataExpires"),
+    unique = false,
+    background = false,
+    dropDups = false,
+    sparse = false,
+    version = None,
+    options = BSONDocument("expireAfterSeconds" -> appConfig.timeToLiveSeconds)
+  )
 
-    override def removeById(id: IdModel)(implicit ec: ExecutionContext): Future[WriteResult] = removeById(id)
-
-    override def addEntry(document: DataModel)(implicit ec: ExecutionContext): Future[WriteResult] = insert(document)
-
-    override def findById(id: IdModel)(implicit ec: ExecutionContext): Future[DataModel] = findById(id)
+  private def setIndex(): Unit = {
+    collection.indexesManager.drop(ttlIndex.name.get) onComplete {
+      _ => collection.indexesManager.ensure(ttlIndex)
+    }
   }
+
+  setIndex()
+
+  override def drop(implicit ec: ExecutionContext): Future[Boolean] =
+    collection.drop(failIfNotFound = false).map { r =>
+      setIndex()
+      r
+    }
+
+  def upsert(data: DataModel): Future[UpdateWriteResult] = {
+    val selector = Json.obj(DataModel._id -> data._id)
+    collection.update(selector, data, upsert = true)
+  }
+
 }

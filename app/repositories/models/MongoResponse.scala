@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package models.requests
+package repositories.models
 
-import play.api.mvc.{Request, WrappedRequest}
-
-case class AuthenticatedRequest[A](request: Request[A]) extends WrappedRequest[A](request)
+sealed trait MongoResponse
+object MongoSuccess extends MongoResponse
+case class MongoError(msg: String) extends MongoResponse

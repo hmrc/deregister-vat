@@ -16,11 +16,24 @@
 
 package repositories.models
 
-import play.api.libs.json.{Format, JsValue, Json}
+import java.time.Instant
 
-case class DataModel(_id: IdModel,
-                     data: JsValue)
+import play.api.libs.json._
+
+case class DataModel(_id: IdModel, data: JsValue)
 
 object DataModel {
-  implicit val formats: Format[DataModel] = Json.format[DataModel]
+
+  val _id = "_id"
+  val data = "data"
+  val creationTimestamp = "creationTimestamp"
+
+  implicit val writes: OWrites[DataModel] = OWrites { model =>
+    Json.obj(
+      _id -> model._id,
+      data -> model.data,
+      creationTimestamp -> Json.obj("$date" -> Instant.now.toEpochMilli)
+    )
+  }
+  implicit val reads: Reads[DataModel] = Json.reads[DataModel]
 }
