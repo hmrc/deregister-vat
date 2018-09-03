@@ -24,6 +24,7 @@ import play.api.mvc._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.auth.core.NoActiveSession
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,8 +46,11 @@ class VatAuthorised @Inject()(val authConnector: AuthConnector) extends BaseCont
         case enrolments ~ credentials =>
           f(User(vrn, arn(enrolments), credentials.providerId)(request))
       } recover {
-        case _ =>
-          Logger.debug(s"[VatAuthorised][async] - User is not authorised to access the service")
+        case _: NoActiveSession =>
+          Logger.debug(s"[VatAuthorised][async] - User has no active session, unauthorised")
+          Unauthorized
+        case _: AuthorisationException =>
+          Logger.debug(s"[VatAuthorised][async] - User has an active session, but does not have sufficient authority")
           Forbidden
       }
   }
