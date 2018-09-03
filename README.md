@@ -6,8 +6,11 @@ This service provides backend functionality to support the Deregister VAT Fronte
 
 It's primary purpose is to support the Storage and Retrieval of Session Data that is captured by the frontend from the User
 
+## Endpoints
+
 ### Store Key-Value Data for VRN and Key
 #### PUT /deregister-vat/data/:vrn/:key
+##
 
 Allows the `deregister-vat-frontent` microservice to store key value data captured during the user journey.
 
@@ -32,12 +35,15 @@ The endpoint is idempotent, if a records already exists for the supplied vrn and
 * **Error Responses:**
 
   * **Code:** 500 (INTERNAL_SERVER_ERROR)
+  
     **Content:** `{ "message" : "Error Message..." }`
 
   * **Code:** 401 (UNAUTHORIZED)
+  
     **Content:** No body returned
 
   * **Code:** 403 (FORBIDDEN)
+  
     **Content:** No body returned
 
 * **Sample Call:**
@@ -55,6 +61,7 @@ The endpoint is idempotent, if a records already exists for the supplied vrn and
 
 ### Get Key-Value Data for VRN and Key
 #### GET /deregister-vat/data/:vrn/:key
+##
 
 Allows the `deregister-vat-frontent` microservice to retrieve stored key value data.
   
@@ -105,6 +112,7 @@ Allows the `deregister-vat-frontent` microservice to retrieve stored key value d
   
 ### Delete Key-Value Data for VRN and Key
 #### DELETE /deregister-vat/data/:vrn/:key
+##
 
 Allows the `deregister-vat-frontent` microservice to delete stored key value data.
 
@@ -146,6 +154,7 @@ If the key is successfully deleted, a success response is returned of 204 (NO_CO
 
 ### Delete Key-Value Data for VRN
 #### DELETE /deregister-vat/data/:vrn
+##
 
 Allows the `deregister-vat-frontent` microservice to delete all stored key value data for a supplied VRN.
 
@@ -182,6 +191,6 @@ Allows the `deregister-vat-frontent` microservice to delete all stored key value
 ```
     
 
-### License
+## License
   
  This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
