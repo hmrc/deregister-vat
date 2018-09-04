@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package models.requests
 
-import controllers.actions.AuthAction
-import javax.inject.{Inject, Singleton}
-import play.api.mvc._
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import play.api.mvc.{Request, WrappedRequest}
 
-@Singleton()
-class SampleController @Inject()(authenticate: AuthAction) extends BaseController {
-
-	def index(): Action[AnyContent] = authenticate { implicit request =>
-		Ok("Hello world")
-	}
-
+case class User[A](vrn: String, arn: Option[String] = None, credId: String)(implicit request: Request[A]) extends WrappedRequest[A](request) {
+  val isAgent: Boolean = arn.isDefined
 }

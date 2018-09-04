@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
-package controllers
+package repositories.models
 
-import base.SpecBase
-import controllers.actions.FakeAuthAction
-import play.api.http.Status
+import java.time.Instant
 
-class SampleControllerSpec extends SpecBase {
+import play.api.libs.json._
 
-  "GET /" should {
-    "return 200" in {
-      val controller = new SampleController(FakeAuthAction)
-      val result = controller.index()(fakeRequest)
-      status(result) shouldBe Status.OK
-    }
+case class DataModel(_id: IdModel, data: JsValue)
+
+object DataModel {
+
+  val _id = "_id"
+  val data = "data"
+  val creationTimestamp = "creationTimestamp"
+
+  implicit val writes: OWrites[DataModel] = OWrites { model =>
+    Json.obj(
+      _id -> model._id,
+      data -> model.data,
+      creationTimestamp -> Json.obj("$date" -> Instant.now.toEpochMilli)
+    )
   }
-
+  implicit val reads: Reads[DataModel] = Json.reads[DataModel]
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package modules
+package testUtils
 
-import com.google.inject.AbstractModule
-import controllers.actions.{AuthAction, AuthActionImpl}
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 
-class AuthModule extends AbstractModule {
-  def configure(): Unit = bind(classOf[AuthAction]).to(classOf[AuthActionImpl])
+trait MaterializerSupport {
+  implicit val system = ActorSystem("Sys")
+  implicit val materializer = ActorMaterializer()
 }

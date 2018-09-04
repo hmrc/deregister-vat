@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package base
+package repositories.models
 
-import org.scalatestplus.play.guice._
-import play.api.inject.Injector
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
-import uk.gov.hmrc.play.test.UnitSpec
+import play.api.libs.json.{Json, OFormat}
 
-trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
+case class IdModel(vrn: String,
+                   key: String)
 
-  def injector: Injector = app.injector
+object IdModel {
 
-  def fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
+  val vrn = "vrn"
+  val key = "key"
 
+  implicit val formats: OFormat[IdModel] = Json.format[IdModel]
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package repositories.models
 
-import models.requests.AuthenticatedRequest
-import play.api.mvc.{Request, Result}
-
-import scala.concurrent.Future
-
-object FakeAuthAction extends AuthAction {
-  override def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]): Future[Result] =
-    block(AuthenticatedRequest(request))
-}
+sealed trait MongoResponse
+object MongoSuccess extends MongoResponse
+case class MongoError(msg: String) extends MongoResponse
