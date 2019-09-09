@@ -2,7 +2,7 @@
 package stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helper.WireMockMethods
+import helpers.WireMockMethods
 import play.api.http.Status.{OK, UNAUTHORIZED}
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup

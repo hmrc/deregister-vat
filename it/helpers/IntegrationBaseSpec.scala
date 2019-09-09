@@ -1,7 +1,6 @@
 
-package BaseSpec
+package helpers
 
-import helpers.WireMockHelper
 import org.scalatest._
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}

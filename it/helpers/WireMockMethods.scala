@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package helper
+package helpers
 
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Writes
 
 trait WireMockMethods {

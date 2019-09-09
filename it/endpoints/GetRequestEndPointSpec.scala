@@ -1,7 +1,7 @@
 
 package endpoints
 
-import BaseSpec.IntegrationBaseSpec
+import helpers.IntegrationBaseSpec
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 
 class GetRequestEndPointSpec extends IntegrationBaseSpec {
