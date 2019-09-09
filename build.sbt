@@ -25,7 +25,7 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 val appName: String = "deregister-vat"
 
-lazy val appDependencies: Seq[ModuleID] = compile ++ test()
+lazy val appDependencies: Seq[ModuleID] = compile ++ test() ++ tmpMacWorkaround()
 lazy val plugins: Seq[Plugins] = Seq.empty
 lazy val playSettings: Seq[Setting[_]] = Seq.empty
 
@@ -103,3 +103,10 @@ lazy val microservice = Project(appName, file("."))
     Resolver.bintrayRepo("hmrc", "releases"),
     Resolver.jcenterRepo
   ))
+
+def tmpMacWorkaround(): Seq[ModuleID] =
+  if (sys.props.get("os.name").fold(false)(_.toLowerCase.contains("mac"))) {
+    Seq("org.reactivemongo" % "reactivemongo-shaded-native" % "0.16.1-osx-x86-64" % "runtime,test,it")
+  } else {
+    Seq()
+  }

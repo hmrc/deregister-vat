@@ -26,7 +26,7 @@ import play.api.libs.ws.WSClient
 
 object WireMockHelper extends Eventually with IntegrationPatience {
 
-  val wmPort: Int = 1111
+  val wmPort: Int = 11111
   val host: String = "localhost"
 }
 
