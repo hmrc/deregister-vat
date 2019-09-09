@@ -25,7 +25,7 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 val appName: String = "deregister-vat"
 
-lazy val appDependencies: Seq[ModuleID] = compile ++ test()
+lazy val appDependencies: Seq[ModuleID] = compile ++ test() ++ tmpMacWorkaround()
 lazy val plugins: Seq[Plugins] = Seq.empty
 lazy val playSettings: Seq[Setting[_]] = Seq.empty
 
@@ -65,7 +65,6 @@ def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
   "org.pegdown" % "pegdown" % "1.6.0" % scope,
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.1" % scope,
   "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-  "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0" % scope,
   "org.mockito" % "mockito-core" % "2.28.2" % scope,
   "com.github.tomakehurst" % "wiremock" % "2.21.0" % scope
 )
@@ -104,3 +103,10 @@ lazy val microservice = Project(appName, file("."))
     Resolver.bintrayRepo("hmrc", "releases"),
     Resolver.jcenterRepo
   ))
+
+def tmpMacWorkaround(): Seq[ModuleID] =
+  if (sys.props.get("os.name").fold(false)(_.toLowerCase.contains("mac"))) {
+    Seq("org.reactivemongo" % "reactivemongo-shaded-native" % "0.16.1-osx-x86-64" % "runtime,test,it")
+  } else {
+    Seq()
+  }

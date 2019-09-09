@@ -19,6 +19,7 @@ class GetRequestEndPointSpec extends IntegrationBaseSpec {
         s"get a 200 response back " in {
 
           AuthStub.authorised()
+          val newRecord :WSResponse = put(path)("forename" -> "de")
           val response: WSResponse = get(path)
           response.status shouldBe 200
 
