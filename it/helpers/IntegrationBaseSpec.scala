@@ -71,6 +71,7 @@ trait IntegrationBaseSpec extends UnitSpec
     buildRequest(path).delete()
   )
 
-  def buildRequest(path: String): WSRequest = client.url(s"http://localhost:$port$appRouteContext$path")
-    .withFollowRedirects(false)
+  def buildRequest(path: String): WSRequest =
+    client.url(s"http://localhost:$port$appRouteContext$path")
+      .withFollowRedirects(false)
 }
