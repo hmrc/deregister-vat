@@ -18,7 +18,7 @@ package stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WireMockMethods
-import play.api.http.Status.OK
+import play.api.http.Status.{OK, UNAUTHORIZED}
 import play.api.libs.json.{JsObject, Json}
 
 object AuthStub extends WireMockMethods {
@@ -40,6 +40,22 @@ object AuthStub extends WireMockMethods {
       .thenReturn(
         status = OK,
         body = authResponse(mtdVatEnrolment)
+      )
+  }
+
+  def unauthenticated(): StubMapping = {
+    when(method = POST, uri = authoriseUri)
+      .thenReturn(
+        status = UNAUTHORIZED,
+        headers = Map("WWW-Authenticate" -> """MDTP detail="MissingBearerToken"""")
+      )
+  }
+
+  def forbidden(): StubMapping = {
+    when(method = POST, uri = authoriseUri)
+      .thenReturn(
+        status = UNAUTHORIZED,
+        headers = Map("WWW-Authenticate" -> """MDTP detail="InsufficientEnrolments"""")
       )
   }
 

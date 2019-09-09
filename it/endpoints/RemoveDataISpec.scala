@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2019 HM Revenue & Customs
  *
@@ -38,6 +37,28 @@ class RemoveDataISpec extends IntegrationBaseSpec {
           val response: WSResponse = delete(path)
           response.status shouldBe 204
         }
+      }
+    }
+
+    "user is unauthenticated" should {
+
+      "return 401 (Unauthorized)" in {
+
+        AuthStub.unauthenticated()
+
+        val response: WSResponse = delete(path)
+        response.status shouldBe 401
+      }
+    }
+
+    "user is forbidden" should {
+
+      "return 403 (Forbidden)" in {
+
+        AuthStub.forbidden()
+
+        val response: WSResponse = delete(path)
+        response.status shouldBe 403
       }
     }
   }
