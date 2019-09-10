@@ -93,24 +93,5 @@ class StoreDataSpec extends IntegrationBaseSpec {
         }
 
       }
-
-    //
-    //  s"Going to the url /$testData/$testVrn/$testKey and a down streaming issue happens " should {
-    //
-    //    s"put a 500 response back " in {
-    //
-    //      val response: WSResponse = await(request(testData, "", "").put())
-    //      response.status shouldBe 500
-    //
-    //    }
-    //
-    //    s"put the error message back " in {
-    //
-    //      val response: WSResponse = await(request(testData, "", "").put())
-    //      response.body.contains("Error Message") shouldBe true
-    //
-    //    }
-    //
-    //  }
   }
 }

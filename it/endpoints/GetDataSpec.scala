@@ -94,24 +94,5 @@ class GetDataSpec extends IntegrationBaseSpec {
         }
 
       }
-
-    //
-    //  s"Going to the url /$testData/$testVrn/$testKey and a down streaming issue happens " should {
-    //
-    //    s"get a 500 response back " in {
-    //
-    //      val response: WSResponse = await(request(testData, "", "").get())
-    //      response.status shouldBe 500
-    //
-    //    }
-    //
-    //    s"get the error message back " in {
-    //
-    //      val response: WSResponse = await(request(testData, "", "").get())
-    //      response.body.contains("Error Message") shouldBe true
-    //
-    //    }
-    //
-    //  }
   }
 }
