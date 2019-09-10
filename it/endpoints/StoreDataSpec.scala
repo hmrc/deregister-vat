@@ -58,7 +58,7 @@ class StoreDataSpec extends IntegrationBaseSpec {
 
     "user is unauthorised" should {
 
-      "put a 401 response and no body is returned " in {
+      "get a 401 response and no body is returned " in {
 
         AuthStub.unauthenticated()
         val response: WSResponse = put(path)(body)
@@ -71,7 +71,7 @@ class StoreDataSpec extends IntegrationBaseSpec {
 
     "user is trying to access forbidden data " should {
 
-      "put a 403 response and no body is returned" in {
+      "get a 403 response and no body is returned" in {
 
         AuthStub.forbidden()
         val response: WSResponse = put(path)(body)
