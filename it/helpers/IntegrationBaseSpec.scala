@@ -19,6 +19,7 @@ package helpers
 import org.scalatest._
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.JsValue
 import play.api.{Application, Environment, Mode}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import uk.gov.hmrc.play.test.UnitSpec
@@ -63,7 +64,7 @@ trait IntegrationBaseSpec extends UnitSpec
     buildRequest(path).get()
   )
 
-  def put(path: String)(body: Map[String, Seq[String]]): WSResponse = await(
+  def put(path: String)(body: JsValue): WSResponse = await(
     buildRequest(path).put(body)
   )
 

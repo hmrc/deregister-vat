@@ -2,13 +2,16 @@
 package endpoints
 
 import helpers.IntegrationBaseSpec
+import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import stubs.AuthStub
 
-class GetRequestEndPointSpec extends IntegrationBaseSpec {
+class GetDataSpec extends IntegrationBaseSpec {
 
   val path = "/data/123456789/testKey"
-  val invalidPath = "/data/123456789/testKey2"
+  val invalidPath = "/data/12345678901/testKey2"
+
+  val body :JsValue = Json.parse("""{"forename" : "john"}""")
 
   "GET /data/:vrn/:key" when {
 
@@ -19,6 +22,7 @@ class GetRequestEndPointSpec extends IntegrationBaseSpec {
         s"get a 200 response back " in {
 
           AuthStub.authorised()
+          val newRecord :WSResponse = put(path)(body)
           val response: WSResponse = get(path)
           response.status shouldBe 200
 
@@ -27,8 +31,8 @@ class GetRequestEndPointSpec extends IntegrationBaseSpec {
         s"get the correct JSON back " in {
 
           AuthStub.authorised()
-          val response = get("testData, testVrn, testKey")
-          response.body should not be ""
+          val response = get(path)
+          response.body shouldBe "{\"forename\":\"john\"}"
 
         }
       }
@@ -44,7 +48,7 @@ class GetRequestEndPointSpec extends IntegrationBaseSpec {
         s"get a error message for No data found " in {
 
           val response: WSResponse = get(invalidPath)
-          response.body shouldBe "{\"message\":\"No data found for vrn: 123456789 and key: testKey2\"}"
+          response.body shouldBe "{\"message\":\"No data found for vrn: 12345678901 and key: testKey2\"}"
 
         }
 
