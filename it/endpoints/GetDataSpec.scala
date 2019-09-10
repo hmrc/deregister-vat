@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package endpoints
 
@@ -11,88 +26,60 @@ class GetDataSpec extends IntegrationBaseSpec {
   val path = "/data/123456789/testKey"
   val invalidPath = "/data/12345678901/testKey2"
 
-  val body :JsValue = Json.parse("""{"forename" : "john"}""")
+  val body: JsValue = Json.parse("""{"forename" : "john"}""")
 
   "GET /data/:vrn/:key" when {
 
     "the user is authorised" when {
 
-      s"mongo successful receives the data" should {
+      "mongo successful receives the data" should {
 
-        s"get a 200 response back " in {
+        "get a 200 response and the correct JSON body" in {
 
           AuthStub.authorised()
-          val newRecord :WSResponse = put(path)(body)
+          put(path)(body)
           val response: WSResponse = get(path)
           response.status shouldBe 200
-
-        }
-
-        s"get the correct JSON back " in {
-
-          AuthStub.authorised()
-          val response = get(path)
           response.body shouldBe "{\"forename\":\"john\"}"
 
         }
       }
-      s"Going to the url $invalidPath and trying to access a non-existing record" should {
+      "user is unsuccessful" should {
 
-        s"get a 404 response back " in {
+        "get a 404 response and the correct error message" in {
 
           val response: WSResponse = get(invalidPath)
           response.status shouldBe 404
-
-        }
-
-        s"get a error message for No data found " in {
-
-          val response: WSResponse = get(invalidPath)
           response.body shouldBe "{\"message\":\"No data found for vrn: 12345678901 and key: testKey2\"}"
 
         }
-
       }
     }
 
-      s"Going to the url $path and not being authorized" should {
+    "user is unauthorised" should {
 
-        s"get a 401 response back " in {
+      "get a 401 response and no body is returned" in {
 
-          AuthStub.unauthenticated()
-          val response: WSResponse = get(path)
-          response.status shouldBe 401
-
-        }
-
-        s"get no body returned" in {
-
-          AuthStub.unauthenticated()
-          val response: WSResponse = get(path)
-          response.body shouldBe ""
-
-        }
+        AuthStub.unauthenticated()
+        val response: WSResponse = get(path)
+        response.status shouldBe 401
+        response.body shouldBe ""
 
       }
 
-      s"Going to the url $path and trying to access forbidden data " should {
+    }
 
-        s"get a 403 response back " in {
+    "user is trying to access forbidden data " should {
 
-          AuthStub.forbidden()
-          val response: WSResponse = get(path)
-          response.status shouldBe 403
+      "get a 403 response and no body is returned" in {
 
-        }
-
-        s"get no body returned " in {
-
-          AuthStub.forbidden()
-          val response: WSResponse = get(path)
-          response.body shouldBe ""
-
-        }
+        AuthStub.forbidden()
+        val response: WSResponse = get(path)
+        response.status shouldBe 403
+        response.body shouldBe ""
 
       }
+
+    }
   }
 }

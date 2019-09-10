@@ -24,16 +24,16 @@ import play.api.libs.json.Writes
 
 trait WireMockMethods {
 
-  def when(method: HTTPMethod, uri: String, headers: Map[String, String] = Map.empty, body: Option[String] = None): Mapping = {
-    new Mapping(method, uri, headers, body)
+  def when(method: HTTPMethod, uri: String, headers: Map[String, String] = Map.empty): Mapping = {
+    new Mapping(method, uri, headers, None)
   }
 
-  class Mapping (method: HTTPMethod, uri:String, headers: Map[String, String], body: Option[String]) {
+  class Mapping(method: HTTPMethod, uri: String, headers: Map[String, String], body: Option[String]) {
     private val mapping = {
       val uriMapping = method.wireMockMapping(urlMatching(uri))
 
-      val uriMappingWithHeaders = headers.foldLeft(uriMapping){
-        case (m, (key, value)) => m.withHeader(key, equalTo(value) )
+      val uriMappingWithHeaders = headers.foldLeft(uriMapping) {
+        case (m, (key, value)) => m.withHeader(key, equalTo(value))
       }
 
       body match {
@@ -54,7 +54,7 @@ trait WireMockMethods {
     private def thenReturnInternal(status: Int, headers: Map[String, String], body: Option[String]): StubMapping = {
       val response = {
         val statusResponse = aResponse().withStatus(status)
-        val responseWithHeaders = headers.foldLeft(statusResponse){
+        val responseWithHeaders = headers.foldLeft(statusResponse) {
           case (res, (key, value)) => res.withHeader(key, value)
         }
         body match {
@@ -77,6 +77,10 @@ trait WireMockMethods {
 
   case object PUT extends HTTPMethod {
     override def wireMockMapping(pattern: UrlPattern): MappingBuilder = put(pattern)
+  }
+
+  case object DELETE extends HTTPMethod {
+    override def wireMockMapping(pattern: UrlPattern): MappingBuilder = delete(pattern)
   }
 
   case object GET extends HTTPMethod {
