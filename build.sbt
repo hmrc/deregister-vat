@@ -54,7 +54,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 }
 
 val compile = Seq(
-  "uk.gov.hmrc" %% "play-reactivemongo" % "6.7.0",
+  "uk.gov.hmrc" %% "play-reactivemongo" % "6.8.0",
   ws,
   "uk.gov.hmrc" %% "bootstrap-play-25" % "5.1.0"
 )
