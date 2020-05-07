@@ -21,7 +21,8 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import testUtils.TestSupport
 import uk.gov.hmrc.auth.core.authorise.{EmptyPredicate, Predicate}
-import uk.gov.hmrc.auth.core.retrieve._
+import uk.gov.hmrc.auth.core.retrieve.{EmptyRetrieval, Retrieval}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 

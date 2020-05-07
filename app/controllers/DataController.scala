@@ -25,13 +25,13 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import repositories.models.{MongoError, MongoSuccess}
 import services.DataService
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.{BackendController, BaseController}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
-class DataController @Inject()(VatAuthorised: VatAuthorised, dataService: DataService)
-                              (implicit ec: ExecutionContext) extends BaseController {
+class DataController @Inject()(VatAuthorised: VatAuthorised, dataService: DataService, cc: ControllerComponents)
+                              (implicit ec: ExecutionContext) extends BackendController(cc) {
 
   private def parseJson(implicit user: User[_]): Either[ErrorModel, JsValue] = user.body match {
     case body: AnyContentAsJson => Right(body.json)

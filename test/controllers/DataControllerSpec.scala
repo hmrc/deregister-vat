@@ -21,12 +21,15 @@ import controllers.actions.mocks.MockVatAuthorised
 import models.responses.ErrorModel
 import play.api.http.Status
 import play.api.libs.json.Json
+import play.api.mvc.ControllerComponents
 import repositories.models.{MongoError, MongoSuccess}
 import services.mocks.MockDataService
+import play.api.test.Helpers.stubControllerComponents
 
 class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
-  object TestDataController extends DataController(mockVatAuthorised, mockDataService)
+  val cc: ControllerComponents = stubControllerComponents()
+  object TestDataController extends DataController(mockVatAuthorised, mockDataService, cc)
   val err = "Mongo Error"
 
   "The .storeData method" when {

@@ -23,13 +23,14 @@ import play.api.Logger
 import play.api.mvc._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.{BackendController, BaseController}
 import uk.gov.hmrc.auth.core.NoActiveSession
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VatAuthorised @Inject()(val authConnector: AuthConnector) extends BaseController with AuthorisedFunctions {
+class VatAuthorised @Inject()(val authConnector: AuthConnector,
+                              cc: ControllerComponents) extends BackendController(cc) with AuthorisedFunctions {
 
   private def delegatedAuthRule(vrn: String): Enrolment =
     Enrolment(Constants.MtdVatEnrolmentKey)

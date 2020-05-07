@@ -20,13 +20,17 @@ import assets.BaseTestConstants.testVatNumber
 import config.Constants
 import connectors.mocks.MockAuthConnector
 import controllers.actions.VatAuthorised
+import play.api.mvc.ControllerComponents
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, Retrievals}
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
+import play.api.test.Helpers.stubControllerComponents
+
 
 trait MockVatAuthorised extends MockAuthConnector {
 
-  val mockVatAuthorised = new VatAuthorised(mockAuthConnector)
+  val cc: ControllerComponents = stubControllerComponents()
+  val mockVatAuthorised = new VatAuthorised(mockAuthConnector, cc)
 
   val vatAuthPredicate: Predicate = Enrolment(Constants.MtdVatEnrolmentKey)
     .withIdentifier(Constants.MtdVatReferenceKey, testVatNumber)

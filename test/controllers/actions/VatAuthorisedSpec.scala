@@ -20,17 +20,19 @@ import assets.BaseTestConstants.testVatNumber
 import config.Constants
 import connectors.mocks.MockAuthConnector
 import play.api.http.Status._
-import play.api.mvc.Result
+import play.api.mvc.{ControllerComponents, Result}
 import play.api.mvc.Results._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.{Enrolment, InsufficientEnrolments, MissingBearerToken}
+import play.api.test.Helpers.stubControllerComponents
 
 import scala.concurrent.Future
 
 
 class VatAuthorisedSpec extends MockAuthConnector {
 
-  object TestVatAuthorised extends VatAuthorised(mockAuthConnector)
+  val cc: ControllerComponents = stubControllerComponents()
+  object TestVatAuthorised extends VatAuthorised(mockAuthConnector, cc)
 
   def result: Future[Result] = TestVatAuthorised.async(testVatNumber) {
     implicit user =>
