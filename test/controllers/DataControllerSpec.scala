@@ -28,7 +28,6 @@ import play.api.test.Helpers.stubControllerComponents
 
 class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
-  val cc: ControllerComponents = stubControllerComponents()
   object TestDataController extends DataController(mockVatAuthorised, mockDataService, cc)
   val err = "Mongo Error"
 

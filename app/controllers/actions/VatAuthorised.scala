@@ -22,8 +22,9 @@ import models.requests.User
 import play.api.Logger
 import play.api.mvc._
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
-import uk.gov.hmrc.play.bootstrap.controller.{BackendController, BaseController}
+import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import uk.gov.hmrc.auth.core.NoActiveSession
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,7 +45,7 @@ class VatAuthorised @Inject()(val authConnector: AuthConnector,
   def async(vrn: String)(f: User[_] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] = Action.async {
     implicit request =>
       authorised(delegatedAuthRule(vrn)).retrieve(Retrievals.allEnrolments and Retrievals.credentials) {
-        case enrolments ~ credentials =>
+        case enrolments ~ Some(credentials) =>
           f(User(vrn, arn(enrolments), credentials.providerId)(request))
       } recover {
         case _: NoActiveSession =>
