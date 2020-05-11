@@ -66,6 +66,12 @@ class VatAuthorisedSpec extends MockAuthConnector {
           status(result) shouldBe OK
         }
       }
+      "the Credentials.providerId cannot be retrieved from the auth profile" should {
+        "return Forbidden" in {
+          mockAuthRetrieveCredentialsNone(authPredicate)
+          status(result) shouldBe FORBIDDEN
+        }
+      }
     }
 
     "For any type of user" when {

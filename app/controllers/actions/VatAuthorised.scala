@@ -47,6 +47,9 @@ class VatAuthorised @Inject()(val authConnector: AuthConnector,
       authorised(delegatedAuthRule(vrn)).retrieve(Retrievals.allEnrolments and Retrievals.credentials) {
         case enrolments ~ Some(credentials) =>
           f(User(vrn, arn(enrolments), credentials.providerId)(request))
+        case _ =>
+          Logger.warn(s"[VatAuthorised][async] - Unable to retrieve Credentials.providerId from auth profile")
+          Future(Forbidden)
       } recover {
         case _: NoActiveSession =>
           Logger.debug(s"[VatAuthorised][async] - User has no active session, unauthorised")

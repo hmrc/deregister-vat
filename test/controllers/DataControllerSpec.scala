@@ -21,10 +21,8 @@ import controllers.actions.mocks.MockVatAuthorised
 import models.responses.ErrorModel
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.mvc.ControllerComponents
 import repositories.models.{MongoError, MongoSuccess}
 import services.mocks.MockDataService
-import play.api.test.Helpers.stubControllerComponents
 
 class DataControllerSpec extends MockVatAuthorised with MockDataService {
 

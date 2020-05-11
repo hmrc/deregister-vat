@@ -61,6 +61,13 @@ trait MockAuthConnector extends TestSupport {
       )
     )
 
+  def mockAuthRetrieveCredentialsNone(predicate: Predicate = EmptyPredicate): Unit =
+    mockAuthorise(predicate = predicate, retrievals = retrievals)(
+      Future.successful(
+        new ~ (Enrolments(Set(testMtdVatEnrolment)), None)
+      )
+    )
+
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     reset(mockAuthConnector)
