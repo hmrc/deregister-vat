@@ -21,7 +21,6 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Format, Json}
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.commands.UpdateWriteResult
-import reactivemongo.api.indexes.IndexType.Ascending
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import repositories.models._
@@ -43,7 +42,7 @@ class DataRepository @Inject()(mongo: ReactiveMongoComponent,
   val creationTimestampKey = "creationTimestamp"
 
   private lazy val ttlIndex = Index(
-    Seq((creationTimestampKey, IndexType(Ascending.value))),
+    Seq((creationTimestampKey, IndexType.Ascending)),
     name = Some("deregDataExpires"),
     unique = false,
     background = false,
@@ -69,7 +68,7 @@ class DataRepository @Inject()(mongo: ReactiveMongoComponent,
 
   def upsert(data: DataModel): Future[UpdateWriteResult] = {
     val selector = Json.obj(DataModel._id -> data._id)
-    collection.update(selector, data, upsert = true)
+    collection.update(ordered = false).one(selector, data, upsert = true)
   }
 
 }

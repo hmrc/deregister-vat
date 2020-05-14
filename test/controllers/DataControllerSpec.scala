@@ -26,7 +26,7 @@ import services.mocks.MockDataService
 
 class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
-  object TestDataController extends DataController(mockVatAuthorised, mockDataService)
+  object TestDataController extends DataController(mockVatAuthorised, mockDataService, cc)
   val err = "Mongo Error"
 
   "The .storeData method" when {
