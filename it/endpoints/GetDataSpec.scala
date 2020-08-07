@@ -18,7 +18,7 @@ package endpoints
 
 import helpers.IntegrationBaseSpec
 import play.api.libs.json.{JsValue, Json}
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.libs.ws.WSResponse
 import stubs.AuthStub
 
 class GetDataSpec extends IntegrationBaseSpec {
