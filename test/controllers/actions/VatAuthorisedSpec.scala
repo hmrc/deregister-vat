@@ -28,15 +28,13 @@ import play.api.test.Helpers.stubControllerComponents
 
 import scala.concurrent.Future
 
-
 class VatAuthorisedSpec extends MockAuthConnector {
 
   val cc: ControllerComponents = stubControllerComponents()
   object TestVatAuthorised extends VatAuthorised(mockAuthConnector, cc)
 
   def result: Future[Result] = TestVatAuthorised.async(testVatNumber) {
-    implicit user =>
-      Future.successful(Ok)
+    _ => Future.successful(Ok)
   }(ec)(fakeRequest)
 
   val authPredicate: Predicate =
