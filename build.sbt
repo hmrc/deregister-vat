@@ -15,12 +15,11 @@
  */
 
 import play.core.PlayVersion
+import play.sbt.routes.RoutesKeys
 import sbt.Tests.{Group, SubProcess}
 import uk.gov.hmrc.DefaultBuildSettings._
-import uk.gov.hmrc.SbtAutoBuildPlugin
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
-import uk.gov.hmrc.versioning.SbtGitVersioning
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 val appName: String = "deregister-vat"
@@ -59,7 +58,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 val compile = Seq(
   "uk.gov.hmrc" %% "simple-reactivemongo" % "7.30.0-play-26",
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-26" % "2.24.0"
+  "uk.gov.hmrc" %% "bootstrap-backend-play-26" % "5.3.0"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
@@ -79,7 +78,7 @@ def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {
 }
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(Seq(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory) ++ plugins: _*)
+  .enablePlugins(Seq(play.sbt.PlayScala, SbtDistributablesPlugin) ++ plugins: _*)
   .settings(PlayKeys.playDefaultPort := 9164)
   .settings(coverageSettings: _*)
   .settings(playSettings: _*)
@@ -93,7 +92,9 @@ lazy val microservice = Project(appName, file("."))
     scalaVersion := "2.12.11",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
-    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
+    PlayKeys.playDefaultPort := 9164,
+    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
+    RoutesKeys.routesImport := Seq.empty
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
@@ -103,8 +104,5 @@ lazy val microservice = Project(appName, file("."))
     resourceDirectory in IntegrationTest := baseDirectory.value / "it" / "resources",
     addTestReportOption(IntegrationTest, "int-test-reports"),
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
-    parallelExecution in IntegrationTest := false)
-  .settings(resolvers ++= Seq(
-    Resolver.bintrayRepo("hmrc", "releases"),
-    Resolver.jcenterRepo
-  ))
+    parallelExecution in IntegrationTest := false
+  )

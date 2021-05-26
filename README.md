@@ -12,7 +12,7 @@ It's primary purpose is to support the Storage and Retrieval of Session Data tha
 #### PUT /deregister-vat/data/:vrn/:key
 ##
 
-Allows the `deregister-vat-frontent` microservice to store key value data captured during the user journey.
+Allows the `deregister-vat-frontend` microservice to store key value data captured during the user journey.
 
 The endpoint is idempotent, if a records already exists for the supplied vrn and key then the document is updated with the payload supplied. If the document does not exist, it is inserted. Both scenarios will return a NO_CONTENT response if successful.
   
@@ -63,7 +63,7 @@ The endpoint is idempotent, if a records already exists for the supplied vrn and
 #### GET /deregister-vat/data/:vrn/:key
 ##
 
-Allows the `deregister-vat-frontent` microservice to retrieve stored key value data.
+Allows the `deregister-vat-frontend` microservice to retrieve stored key value data.
   
 *  **URL Params**
 
@@ -114,7 +114,7 @@ Allows the `deregister-vat-frontent` microservice to retrieve stored key value d
 #### DELETE /deregister-vat/data/:vrn/:key
 ##
 
-Allows the `deregister-vat-frontent` microservice to delete stored key value data.
+Allows the `deregister-vat-frontend` microservice to delete stored key value data.
 
 If the key is successfully deleted, a success response is returned of 204 (NO_CONTENT) - If the key did not exist in the DB then the API will return the same success response as the desired end result/state has been reached already.
 
@@ -156,7 +156,7 @@ If the key is successfully deleted, a success response is returned of 204 (NO_CO
 #### DELETE /deregister-vat/data/:vrn
 ##
 
-Allows the `deregister-vat-frontent` microservice to delete all stored key value data for a supplied VRN.
+Allows the `deregister-vat-frontend` microservice to delete all stored key value data for a supplied VRN.
 
 *  **URL Params**
 
