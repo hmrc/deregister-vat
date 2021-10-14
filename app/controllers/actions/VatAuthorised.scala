@@ -19,19 +19,18 @@ package controllers.actions
 import config.Constants
 import javax.inject.{Inject, Singleton}
 import models.requests.User
-import play.api.Logger
 import play.api.mvc._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.auth.core.NoActiveSession
-
+import utils.LoggerUtil
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class VatAuthorised @Inject()(val authConnector: AuthConnector,
-                              cc: ControllerComponents) extends BackendController(cc) with AuthorisedFunctions {
+                              cc: ControllerComponents) extends BackendController(cc) with AuthorisedFunctions with LoggerUtil {
 
   private def delegatedAuthRule(vrn: String): Enrolment =
     Enrolment(Constants.MtdVatEnrolmentKey)
@@ -48,14 +47,14 @@ class VatAuthorised @Inject()(val authConnector: AuthConnector,
         case enrolments ~ Some(credentials) =>
           f(User(vrn, arn(enrolments), credentials.providerId)(request))
         case _ =>
-          Logger.warn(s"[VatAuthorised][async] - Unable to retrieve Credentials.providerId from auth profile")
+          logger.warn(s"[VatAuthorised][async] - Unable to retrieve Credentials.providerId from auth profile")
           Future(Forbidden)
       } recover {
         case _: NoActiveSession =>
-          Logger.debug(s"[VatAuthorised][async] - User has no active session, unauthorised")
+          logger.debug(s"[VatAuthorised][async] - User has no active session, unauthorised")
           Unauthorized
         case _: AuthorisationException =>
-          Logger.debug(s"[VatAuthorised][async] - User has an active session, but does not have sufficient authority")
+          logger.debug(s"[VatAuthorised][async] - User has an active session, but does not have sufficient authority")
           Forbidden
       }
   }

@@ -24,8 +24,7 @@ import play.api.mvc.{ControllerComponents, Result}
 import play.api.mvc.Results._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.{Enrolment, InsufficientEnrolments, MissingBearerToken}
-import play.api.test.Helpers.stubControllerComponents
-
+import play.api.test.Helpers.{defaultAwaitTimeout, status, stubControllerComponents}
 import scala.concurrent.Future
 
 class VatAuthorisedSpec extends MockAuthConnector {

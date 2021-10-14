@@ -17,14 +17,16 @@
 package helpers
 
 import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
 import play.api.{Application, Environment, Mode}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
-import uk.gov.hmrc.play.test.UnitSpec
+import org.scalatest.matchers.should.Matchers
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 
-trait IntegrationBaseSpec extends UnitSpec
+trait IntegrationBaseSpec extends AnyWordSpecLike
   with WireMockHelper
   with Matchers
   with GuiceOneServerPerSuite

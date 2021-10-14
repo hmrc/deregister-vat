@@ -23,7 +23,6 @@ import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
 import repositories.DataRepository
 import repositories.models.{DataModel, IdModel}
 import testUtils.TestSupport
-
 import scala.concurrent.Future
 
 trait MockDataRepository extends TestSupport {
@@ -50,7 +49,7 @@ trait MockDataRepository extends TestSupport {
 
   def mockFindById(id: IdModel)(response: Option[DataModel]): OngoingStubbing[Future[Option[DataModel]]] =
     when(mockDataRepository.findById(ArgumentMatchers.eq(id), ArgumentMatchers.any())(ArgumentMatchers.any()))
-      .thenReturn(response)
+      .thenReturn(Future.successful(response))
 
   def mockRemove(response: Future[WriteResult]): OngoingStubbing[Future[WriteResult]] =
     when(mockDataRepository.remove(ArgumentMatchers.any())(ArgumentMatchers.any()))

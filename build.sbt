@@ -49,26 +49,27 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
   Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 90,
+    ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true
   )
 }
 
 val compile = Seq(
-  "uk.gov.hmrc" %% "simple-reactivemongo" % "7.30.0-play-26",
+  "uk.gov.hmrc" %% "simple-reactivemongo" % "8.0.0-play-28",
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-26" % "5.3.0"
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.15.0"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc"             %% "hmrctest"           % "3.9.0-play-26"     % scope,
-  "org.scalatest"           %% "scalatest"          % "3.0.8"             % scope,
-  "org.pegdown"             % "pegdown"             % "1.6.0"             % scope,
-  "org.scalatestplus.play"  %% "scalatestplus-play" % "3.1.3"             % scope,
-  "com.typesafe.play"       %% "play-test"          % PlayVersion.current % scope,
-  "org.mockito"             % "mockito-core"        % "2.9.0"             % scope,
-  "com.github.tomakehurst"  % "wiremock-jre8"       % "2.26.3"            % scope
+  "org.scalatest"           %% "scalatest"                  % "3.1.4"             % scope,
+  "org.pegdown"             % "pegdown"                     % "1.6.0"             % scope,
+  "org.scalatestplus.play"  %% "scalatestplus-play"         % "5.1.0"             % scope,
+  "com.typesafe.play"       %% "play-test"                  % PlayVersion.current % scope,
+  "org.mockito"             % "mockito-core"                % "2.9.0"             % scope,
+  "com.github.tomakehurst"  % "wiremock-jre8"               % "2.26.3"            % scope,
+  "com.vladsch.flexmark"    % "flexmark-all"                % "0.36.8"            % scope,
+  "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-M2"          % scope
 )
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {
@@ -89,7 +90,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     Keys.fork in Test := true,
     javaOptions in Test += "-Dlogger.resource=logback-test.xml",
-    scalaVersion := "2.12.11",
+    scalaVersion := "2.12.14",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     PlayKeys.playDefaultPort := 9164,

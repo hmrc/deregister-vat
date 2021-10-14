@@ -21,6 +21,7 @@ import controllers.actions.mocks.MockVatAuthorised
 import models.responses.ErrorModel
 import play.api.http.Status
 import play.api.libs.json.Json
+import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
 import repositories.models.{MongoError, MongoSuccess}
 import services.mocks.MockDataService
 
@@ -59,7 +60,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
           }
 
           "return the correct ErrorModel with message" in {
-            await(jsonBodyOf(result)) shouldBe Json.toJson(ErrorModel("Error when adding data to Mongo Repository"))
+            contentAsJson(result) shouldBe Json.toJson(ErrorModel("Error when adding data to Mongo Repository"))
           }
         }
       }
@@ -76,7 +77,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
         }
 
         "return the correct error message in ErrorModel format" in {
-          await(jsonBodyOf(result)) shouldBe Json.toJson(ErrorModel("Body of request did not contain valid JSON"))
+          contentAsJson(result) shouldBe Json.toJson(ErrorModel("Body of request did not contain valid JSON"))
         }
       }
     }
@@ -98,7 +99,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
         }
 
         "return the JSON body of the DataModels data field" in {
-          await(jsonBodyOf(result)) shouldBe testStoreDataModel.data
+          contentAsJson(result) shouldBe testStoreDataModel.data
         }
       }
 
@@ -114,7 +115,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
         }
 
         "return the correct ErrorModel with message" in {
-          await(jsonBodyOf(result)) shouldBe Json.toJson(ErrorModel(s"No data found for vrn: $testVatNumber and key: $testStoreDataKey"))
+          contentAsJson(result) shouldBe Json.toJson(ErrorModel(s"No data found for vrn: $testVatNumber and key: $testStoreDataKey"))
         }
       }
     }
@@ -148,7 +149,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
         }
 
         "return the correct ErrorModel with message" in {
-          await(jsonBodyOf(result)) shouldBe
+          contentAsJson(result) shouldBe
             Json.toJson(ErrorModel(s"Error when removing data for vrn: $testVatNumber and key: $testStoreDataKey"))
         }
       }
@@ -183,7 +184,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
         }
 
         "return the correct ErrorModel with message" in {
-          await(jsonBodyOf(result)) shouldBe
+          contentAsJson(result) shouldBe
             Json.toJson(ErrorModel(s"Error when removing all data for vrn: $testVatNumber"))
         }
       }
