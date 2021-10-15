@@ -20,6 +20,8 @@ import assets.BaseTestConstants.testVatNumber
 import config.Constants
 import connectors.mocks.MockAuthConnector
 import controllers.actions.VatAuthorised
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.mvc.ControllerComponents
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -27,8 +29,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 import play.api.test.Helpers.stubControllerComponents
 
-
-trait MockVatAuthorised extends MockAuthConnector {
+trait MockVatAuthorised extends MockAuthConnector with AnyWordSpecLike with Matchers {
 
   val cc: ControllerComponents = stubControllerComponents()
   val mockVatAuthorised = new VatAuthorised(mockAuthConnector, cc)

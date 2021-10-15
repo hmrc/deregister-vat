@@ -17,10 +17,14 @@
 package services
 
 import assets.BaseTestConstants._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import repositories.mocks.MockDataRepository
 import repositories.models.{DataModel, IdModel, MongoError, MongoSuccess}
+import scala.concurrent.Future
 
-class DataServiceSpec extends MockDataRepository {
+class DataServiceSpec extends MockDataRepository with AnyWordSpecLike with Matchers {
 
   object TestDataService extends DataService(mockDataRepository)
 
@@ -29,7 +33,7 @@ class DataServiceSpec extends MockDataRepository {
     "a successful response is returned from the Mongo insert" should {
 
       "return MongoSuccess case object" in {
-        mockAddEntry(DataModel(IdModel(testVatNumber, testStoreDataKey), testStoreDataJson))(successUpdateWriteResult)
+        mockAddEntry(DataModel(IdModel(testVatNumber, testStoreDataKey), testStoreDataJson))(Future(successUpdateWriteResult))
         await(TestDataService.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe MongoSuccess
       }
     }
@@ -67,7 +71,7 @@ class DataServiceSpec extends MockDataRepository {
     "a document is successfully deleted" should {
 
       "return MongoSuccess case object" in {
-        mockRemoveById(IdModel(testVatNumber, testStoreDataKey))(successWriteResult)
+        mockRemoveById(IdModel(testVatNumber, testStoreDataKey))(Future(successWriteResult))
         await(TestDataService.removeData(testVatNumber, testStoreDataKey)) shouldBe MongoSuccess
       }
     }
@@ -86,7 +90,7 @@ class DataServiceSpec extends MockDataRepository {
     "documents are successfully deleted" should {
 
       "return MongoSuccess case object" in {
-        mockRemove(successWriteResult)
+        mockRemove(Future(successWriteResult))
         await(TestDataService.removeAll(testVatNumber)) shouldBe MongoSuccess
       }
     }
