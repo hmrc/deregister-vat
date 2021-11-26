@@ -60,12 +60,6 @@ class DataRepository @Inject()(mongo: ReactiveMongoComponent,
 
   setIndex()
 
-  override def drop(implicit ec: ExecutionContext): Future[Boolean] =
-    collection.drop(failIfNotFound = false).map { r =>
-      setIndex()
-      r
-    }
-
   def upsert(data: DataModel): Future[UpdateWriteResult] = {
     val selector = Json.obj(DataModel._id -> data._id)
     collection.update(ordered = false).one(selector, data, upsert = true)
