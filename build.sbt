@@ -33,24 +33,17 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
   val excludedPackages = Seq(
     "<empty>",
-    "Reverse.*",
-    ".*standardError*.*",
-    ".*govuk_wrapper*.*",
-    ".*main_template*.*",
-    "uk.gov.hmrc.BuildInfo",
+    ".*Reverse.*",
     "app.*",
     "prod.*",
     "config.*",
-    "testOnlyDoNotUseInAppConf.*",
-    "partials.*",
-    "com.kenshoo.play.metrics.*",
-    "controllers.javascript",
-    "controllers.ReverseDataController")
+    "testOnlyDoNotUseInAppConf.*"
+  )
 
   Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 90,
-    ScoverageKeys.coverageFailOnMinimum := false,
+    ScoverageKeys.coverageMinimumStmtTotal := 95,
+    ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true
   )
 }
@@ -58,7 +51,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 val compile = Seq(
   "uk.gov.hmrc" %% "simple-reactivemongo" % "8.0.0-play-28",
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.15.0"
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.18.0"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
