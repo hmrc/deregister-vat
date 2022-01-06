@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext
 
 trait TestSupport extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with MockitoSugar
-  with BeforeAndAfterAll with BeforeAndAfterEach with MaterializerSupport {
+  with BeforeAndAfterAll with BeforeAndAfterEach {
 
   implicit lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
