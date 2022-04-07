@@ -17,34 +17,52 @@
 package services
 
 import javax.inject.{Inject, Singleton}
+import org.mongodb.scala.model.Filters.equal
+import org.mongodb.scala.result.{DeleteResult, UpdateResult}
 import play.api.libs.json.JsValue
-import reactivemongo.api.commands.WriteResult
 import repositories.DataRepository
 import repositories.models._
+import uk.gov.hmrc.mongo.play.json.Codecs
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class DataService @Inject()(dataRepository: DataRepository)(implicit ec: ExecutionContext) {
 
-  private def handleResult: Future[WriteResult] => Future[MongoResponse] = _ map {
-    _ => MongoSuccess
+  private def handleUpdateResult: Future[UpdateResult] => Future[MongoResponse] = _ map {
+    case r if r.wasAcknowledged => MongoSuccess
+    case _ => MongoError("Update was unacknowledged")
+  } recover {
+    case err => MongoError(err.getMessage)
+  }
+
+  private def handleDeleteResult: Future[DeleteResult] => Future[MongoResponse] = _ map {
+    case r if r.getDeletedCount > 0 => MongoSuccess
+    case _ => MongoError("Failed to delete")
   } recover {
     case err => MongoError(err.getMessage)
   }
 
   def update(vrn: String, key: String, data: JsValue): Future[MongoResponse] = {
     val document = DataModel(IdModel(vrn, key), data)
-    handleResult(dataRepository.upsert(document))
+    handleUpdateResult(dataRepository.upsert(document))
   }
 
-  def removeData(vrn: String, key: String): Future[MongoResponse] =
-    handleResult(dataRepository.removeById(IdModel(vrn, key)))
+  def removeData(vrn: String, key: String): Future[MongoResponse] = {
+    handleDeleteResult(dataRepository.collection.deleteOne(
+      equal(DataModel._id, Codecs.toBson(IdModel(vrn, key)))
+    ).toFuture())
+  }
 
   def removeAll(vrn: String): Future[MongoResponse] = {
-    handleResult(dataRepository.remove(s"${DataModel._id}.${IdModel.vrn}" -> vrn))
+    handleDeleteResult(dataRepository.collection.deleteMany(
+      equal(DataModel._id,equal(IdModel.vrn, vrn))).toFuture()
+    )
   }
 
-  def getData(vrn: String, key: String): Future[Option[DataModel]] =
-    dataRepository.findById(IdModel(vrn, key))
+  def getData(vrn: String, key: String): Future[Option[DataModel]] = {
+    dataRepository.collection.find(
+      equal(DataModel._id, Codecs.toBson(IdModel(vrn, key)))
+    ).first().toFutureOption()
+  }
 }

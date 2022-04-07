@@ -32,7 +32,14 @@ object BaseTestConstants {
   val testCredentials: Credentials = Credentials("GG123456789", "GG")
 
   val testStoreDataKey: String = "test"
-  val testStoreDataJson: JsValue = Json.obj("key" -> "value")
+  val testStoreDataJson: JsValue = {
+    Json.obj("_id" -> Json.obj("vrn" -> "999999999", "key" -> "test"),
+      "data" -> Json.obj("key" -> "value"),
+      "creationTimestamp" -> Json.obj("$date" -> Json.obj("$numberLong" -> "1650551144194"))
+    )
+
+  }
+  val testInvalidStoreData: JsValue = Json.arr(Json.obj("blah" -> "blah"), Json.obj("blah" -> "blah"))
   val testStoreDataModel = DataModel(IdModel(testVatNumber, testStoreDataKey), testStoreDataJson)
 
 }

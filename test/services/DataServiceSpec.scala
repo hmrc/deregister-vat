@@ -20,48 +20,55 @@ import assets.BaseTestConstants._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import repositories.mocks.MockDataRepository
-import repositories.models.{DataModel, IdModel, MongoError, MongoSuccess}
-import scala.concurrent.Future
+import repositories.DataRepository
+import repositories.models.{DataModel, MongoError, MongoSuccess}
+import testUtils.TestSupport
+import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
-class DataServiceSpec extends MockDataRepository with AnyWordSpecLike with Matchers {
+class DataServiceSpec extends TestSupport with AnyWordSpecLike with Matchers with DefaultPlayMongoRepositorySupport[DataModel] {
 
-  object TestDataService extends DataService(mockDataRepository)
+  override lazy val repository: DataRepository = new DataRepository(mongoComponent, mockConfig)
+  lazy val service = new DataService(repository)
+
+  val deleteError = MongoError("Failed to delete")
+  val updateError = MongoError("Update was unacknowledged")
 
   "The .update method" when {
 
-    "a successful response is returned from the Mongo insert" should {
+    "the data is valid" should {
+
+      "ensure indexes are created" in {
+        await(repository.collection.listIndexes().toFuture()).size shouldBe 2
+      }
 
       "return MongoSuccess case object" in {
-        mockAddEntry(DataModel(IdModel(testVatNumber, testStoreDataKey), testStoreDataJson))(Future(successUpdateWriteResult))
-        await(TestDataService.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe MongoSuccess
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe MongoSuccess
       }
     }
 
-    "an error response is returned from the Mongo insert" should {
+    "the data is invalid" should {
 
       "return MongoError case object" in {
-        mockAddEntry(DataModel(IdModel(testVatNumber, testStoreDataKey), testStoreDataJson))(errorResult)
-        await(TestDataService.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe MongoError(errMsg)
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe
+          MongoError("Update was unacknowledged")
       }
     }
   }
 
   "The .getData method" when {
 
-    "a document is returned from the Mongo findById method" should {
+    "the query data is valid" should {
 
-      "return MongoSuccess case object" in {
-        mockFindById(IdModel(testVatNumber, testStoreDataKey))(Some(testStoreDataModel))
-        await(TestDataService.getData(testVatNumber, testStoreDataKey)) shouldBe Some(testStoreDataModel)
+      "return the correct data model" in {
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+        await(service.getData(testVatNumber, testStoreDataKey)) shouldBe Some(testStoreDataModel)
       }
     }
 
-    "no document is returned from the Mongo findById method" should {
+    "the query data is invalid" should {
 
-      "return MongoError case object" in {
-        mockFindById(IdModel(testVatNumber, testStoreDataKey))(None)
-        await(TestDataService.getData(testVatNumber, testStoreDataKey)) shouldBe None
+      "return None" in {
+        await(service.getData(testVatNumber, testStoreDataKey)) shouldBe None
       }
     }
   }
@@ -71,16 +78,14 @@ class DataServiceSpec extends MockDataRepository with AnyWordSpecLike with Match
     "a document is successfully deleted" should {
 
       "return MongoSuccess case object" in {
-        mockRemoveById(IdModel(testVatNumber, testStoreDataKey))(Future(successWriteResult))
-        await(TestDataService.removeData(testVatNumber, testStoreDataKey)) shouldBe MongoSuccess
+        await(service.removeData(testVatNumber, testStoreDataKey)) shouldBe MongoSuccess
       }
     }
 
-    "an error is returned from mongo" should {
+    "the document cannot be deleted" should {
 
       "return MongoError case object" in {
-        mockRemoveById(IdModel(testVatNumber, testStoreDataKey))(errorResult)
-        await(TestDataService.removeData(testVatNumber, testStoreDataKey)) shouldBe MongoError(errMsg)
+        await(service.removeData(testVatNumber, testStoreDataKey)) shouldBe MongoError("Failed to delete")
       }
     }
   }
@@ -89,17 +94,19 @@ class DataServiceSpec extends MockDataRepository with AnyWordSpecLike with Match
 
     "documents are successfully deleted" should {
 
-      "return MongoSuccess case object" in {
-        mockRemove(Future(successWriteResult))
-        await(TestDataService.removeAll(testVatNumber)) shouldBe MongoSuccess
+      "return a MongoSuccess" in {
+        val result = {
+          await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+          await(service.removeAll(testVatNumber))
+        }
+        result shouldBe MongoSuccess
       }
     }
 
-    "an error is returned from mongo" should {
+    "documents cannot be deleted" should {
 
       "return MongoError case object" in {
-        mockRemove(errorResult)
-        await(TestDataService.removeAll(testVatNumber)) shouldBe MongoError(errMsg)
+        await(service.removeAll(testVatNumber)) shouldBe deleteError
       }
     }
   }

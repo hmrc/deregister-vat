@@ -49,7 +49,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 }
 
 val compile = Seq(
-  "uk.gov.hmrc" %% "simple-reactivemongo" % "8.0.0-play-28",
+  "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28" % "0.62.0",
   ws,
   "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.18.0"
 )
@@ -59,10 +59,10 @@ def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
   "org.pegdown"             % "pegdown"                     % "1.6.0"             % scope,
   "org.scalatestplus.play"  %% "scalatestplus-play"         % "5.1.0"             % scope,
   "com.typesafe.play"       %% "play-test"                  % PlayVersion.current % scope,
-  "org.mockito"             % "mockito-core"                % "2.9.0"             % scope,
   "com.github.tomakehurst"  % "wiremock-jre8"               % "2.26.3"            % scope,
   "com.vladsch.flexmark"    % "flexmark-all"                % "0.36.8"            % scope,
-  "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-M2"          % scope
+  "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-M2"          % scope,
+  "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-28"    % "0.62.0"            % scope
 )
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {

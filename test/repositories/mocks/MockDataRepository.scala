@@ -16,43 +16,16 @@
 
 package repositories.mocks
 
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito._
-import org.mockito.stubbing.OngoingStubbing
-import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
-import repositories.DataRepository
-import repositories.models.{DataModel, IdModel}
+import com.mongodb.client.result.{DeleteResult, UpdateResult}
+import org.mongodb.scala.bson.BsonObjectId
+import org.mongodb.scala.result.{DeleteResult, UpdateResult}
 import testUtils.TestSupport
-import scala.concurrent.Future
 
 trait MockDataRepository extends TestSupport {
 
-  val successUpdateWriteResult: UpdateWriteResult = mock[UpdateWriteResult]
-  val successWriteResult: WriteResult = mock[WriteResult]
-  val errMsg = "Mongo Err"
-  val errorResult = Future.failed(new Exception(errMsg))
-
-  lazy val mockDataRepository: DataRepository = mock[DataRepository]
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    reset(mockDataRepository)
-  }
-
-  def mockAddEntry(data: DataModel)(response: Future[UpdateWriteResult]): OngoingStubbing[Future[UpdateWriteResult]] =
-    when(mockDataRepository.upsert(ArgumentMatchers.eq(data)))
-      .thenReturn(response)
-
-  def mockRemoveById(id: IdModel)(response: Future[WriteResult]): OngoingStubbing[Future[WriteResult]] =
-    when(mockDataRepository.removeById(ArgumentMatchers.eq(id), ArgumentMatchers.any())(ArgumentMatchers.any()))
-      .thenReturn(response)
-
-  def mockFindById(id: IdModel)(response: Option[DataModel]): OngoingStubbing[Future[Option[DataModel]]] =
-    when(mockDataRepository.findById(ArgumentMatchers.eq(id), ArgumentMatchers.any())(ArgumentMatchers.any()))
-      .thenReturn(Future.successful(response))
-
-  def mockRemove(response: Future[WriteResult]): OngoingStubbing[Future[WriteResult]] =
-    when(mockDataRepository.remove(ArgumentMatchers.any())(ArgumentMatchers.any()))
-      .thenReturn(response)
+  val successWriteResult: UpdateResult = UpdateResult.acknowledged(1, 1, BsonObjectId())
+  val successDeleteResult: DeleteResult = DeleteResult.acknowledged(1)
+  val errorWriteResult: UpdateResult = UpdateResult.unacknowledged()
+  val errorDeleteResult: DeleteResult = DeleteResult.unacknowledged()
 
 }

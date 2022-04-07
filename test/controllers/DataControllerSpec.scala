@@ -27,7 +27,7 @@ import services.mocks.MockDataService
 
 class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
-  object TestDataController extends DataController(mockVatAuthorised, mockDataService, cc)
+  lazy val controller = new DataController(mockVatAuthorised, mockDataService, cc)
   val err = "Mongo Error"
 
   "The .storeData method" when {
@@ -42,7 +42,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
             mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
             mockAddEntry(testVatNumber, testStoreDataKey, testStoreDataJson)(MongoSuccess)
 
-            val result = TestDataController.storeData(testVatNumber, testStoreDataKey)(fakeRequest.withJsonBody(testStoreDataJson))
+            val result = controller.storeData(testVatNumber, testStoreDataKey)(fakeRequest.withJsonBody(testStoreDataJson))
 
             status(result) shouldBe Status.NO_CONTENT
           }
@@ -50,7 +50,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
         "an error response is returned from the Mongo insert" should {
 
-          lazy val result = TestDataController.storeData(testVatNumber, testStoreDataKey)(fakeRequest.withJsonBody(testStoreDataJson))
+          lazy val result = controller.storeData(testVatNumber, testStoreDataKey)(fakeRequest.withJsonBody(testStoreDataJson))
 
           "return status ISE (500)" in {
             mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
@@ -67,7 +67,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
       "an invalid JSON body is received" should {
 
-        lazy val result = TestDataController.storeData(testVatNumber, testStoreDataKey)(fakeRequest)
+        lazy val result = controller.storeData(testVatNumber, testStoreDataKey)(fakeRequest)
 
         "return status BAD_REQUEST (400)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
@@ -89,7 +89,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
       "a document is returned from the Mongo findById method" should {
 
-        lazy val result = TestDataController.getData(testVatNumber, testStoreDataKey)(fakeRequest)
+        lazy val result = controller.getData(testVatNumber, testStoreDataKey)(fakeRequest)
 
         "return status OK (200)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
@@ -105,7 +105,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
       "no document is returned from the Mongo findById method" should {
 
-        lazy val result = TestDataController.getData(testVatNumber, testStoreDataKey)(fakeRequest)
+        lazy val result = controller.getData(testVatNumber, testStoreDataKey)(fakeRequest)
 
         "return status NOT_FOUND (404)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
@@ -127,7 +127,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
       "a document is successfully deleted" should {
 
-        lazy val result = TestDataController.removeData(testVatNumber, testStoreDataKey)(fakeRequest)
+        lazy val result = controller.removeData(testVatNumber, testStoreDataKey)(fakeRequest)
 
         "return status NO_CONTENT (204)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
@@ -139,7 +139,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
       "an error is returned from mongo" should {
 
-        lazy val result = TestDataController.removeData(testVatNumber, testStoreDataKey)(fakeRequest)
+        lazy val result = controller.removeData(testVatNumber, testStoreDataKey)(fakeRequest)
 
         "return status ISE (500)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
@@ -162,7 +162,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
       "documents are successfully deleted" should {
 
-        lazy val result = TestDataController.removeAll(testVatNumber)(fakeRequest)
+        lazy val result = controller.removeAll(testVatNumber)(fakeRequest)
 
         "return status NO_CONTENT (204)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
@@ -174,7 +174,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
       "an error is returned from mongo" should {
 
-        lazy val result = TestDataController.removeAll(testVatNumber)(fakeRequest)
+        lazy val result = controller.removeAll(testVatNumber)(fakeRequest)
 
         "return status ISE (500)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
