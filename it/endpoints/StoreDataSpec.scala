@@ -50,7 +50,7 @@ class StoreDataSpec extends IntegrationBaseSpec {
 
           val response: WSResponse = put(invalidPath)(body)
           response.status shouldBe 204
-          response.body.toString shouldBe ""
+          response.body shouldBe ""
 
         }
       }

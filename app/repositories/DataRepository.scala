@@ -20,17 +20,14 @@ import java.util.concurrent.TimeUnit
 
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
-import org.mongodb.scala.model.Updates.set
-import org.mongodb.scala.model.{IndexModel, IndexOptions, UpdateOptions}
-import org.mongodb.scala.result.UpdateResult
+import org.mongodb.scala.model.{IndexModel, IndexOptions}
 import play.api.libs.json.Format
 import repositories.models._
 import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class DataRepository @Inject()(mongo: MongoComponent,
@@ -39,24 +36,23 @@ class DataRepository @Inject()(mongo: MongoComponent,
     mongoComponent = mongo,
     collectionName = "deregData",
     domainFormat = implicitly[Format[DataModel]],
-    indexes = Seq(IndexModel(
-      ascending("creationTimestamp"),
-      IndexOptions()
-        .name("deregDataExpires")
-        .expireAfter(appConfig.timeToLiveSeconds, TimeUnit.SECONDS)
-        .unique(false)
-        .background(false)
-        .sparse(false)
-    )),
+    indexes = Seq(
+      IndexModel(
+        ascending(DataModel.creationTimestamp),
+        IndexOptions()
+          .name("deregDataExpires")
+          .expireAfter(appConfig.timeToLiveSeconds, TimeUnit.SECONDS)
+          .unique(false)
+          .background(false)
+          .sparse(false)
+      ),
+      IndexModel(
+        ascending(s"${DataModel._id}.${IdModel.vrn}"),
+        IndexOptions().name("VRNIndex")
+      )
+    ),
     replaceIndexes = true
   ) {
 
   collection.createIndexes(indexes)
-
-  def upsert(data: DataModel): Future[UpdateResult] = {
-    val filter = equal(DataModel._id, Codecs.toBson(data._id))
-    val update = set(DataModel.data, data)
-    collection.updateOne(filter, update, UpdateOptions().upsert(true)).toFuture()
-  }
-
 }

@@ -22,13 +22,11 @@ import models.responses.ErrorModel
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
-import repositories.models.{MongoError, MongoSuccess}
 import services.mocks.MockDataService
 
 class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
   lazy val controller = new DataController(mockVatAuthorised, mockDataService, cc)
-  val err = "Mongo Error"
 
   "The .storeData method" when {
 
@@ -40,7 +38,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
           "return status NO_CONTENT (204)" in {
             mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
-            mockAddEntry(testVatNumber, testStoreDataKey, testStoreDataJson)(MongoSuccess)
+            mockAddEntry(testVatNumber, testStoreDataKey, testStoreDataJson)(successUpdateResult)
 
             val result = controller.storeData(testVatNumber, testStoreDataKey)(fakeRequest.withJsonBody(testStoreDataJson))
 
@@ -54,7 +52,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
           "return status ISE (500)" in {
             mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
-            mockAddEntry(testVatNumber, testStoreDataKey, testStoreDataJson)(MongoError(err))
+            mockAddEntry(testVatNumber, testStoreDataKey, testStoreDataJson)(errorUpdateResult)
 
             status(result) shouldBe Status.INTERNAL_SERVER_ERROR
           }
@@ -71,8 +69,6 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
         "return status BAD_REQUEST (400)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
-          mockAddEntry(testVatNumber, testStoreDataKey, testStoreDataJson)(MongoSuccess)
-
           status(result) shouldBe Status.BAD_REQUEST
         }
 
@@ -131,7 +127,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
         "return status NO_CONTENT (204)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
-          mockRemoveData(testVatNumber, testStoreDataKey)(MongoSuccess)
+          mockRemoveData(testVatNumber, testStoreDataKey)(successDeleteResult)
 
           status(result) shouldBe Status.NO_CONTENT
         }
@@ -143,7 +139,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
         "return status ISE (500)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
-          mockRemoveData(testVatNumber, testStoreDataKey)(MongoError(err))
+          mockRemoveData(testVatNumber, testStoreDataKey)(errorDeleteResult)
 
           status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         }
@@ -166,7 +162,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
         "return status NO_CONTENT (204)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
-          mockRemove(testVatNumber)(MongoSuccess)
+          mockRemoveAll(testVatNumber)(successDeleteResult)
 
           status(result) shouldBe Status.NO_CONTENT
         }
@@ -178,7 +174,7 @@ class DataControllerSpec extends MockVatAuthorised with MockDataService {
 
         "return status ISE (500)" in {
           mockAuthRetrieveMtdVatEnrolled(vatAuthPredicate)
-          mockRemove(testVatNumber)(MongoError(err))
+          mockRemoveAll(testVatNumber)(errorDeleteResult)
 
           status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         }

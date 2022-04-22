@@ -17,40 +17,54 @@
 package services
 
 import assets.BaseTestConstants._
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpecLike
+import com.mongodb.client.result.{DeleteResult, UpdateResult}
+import play.api.libs.json.Json
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import repositories.DataRepository
-import repositories.models.{DataModel, MongoError, MongoSuccess}
+import repositories.models.{DataModel, IdModel}
 import testUtils.TestSupport
+import uk.gov.hmrc.mongo.play.json.Codecs
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
-class DataServiceSpec extends TestSupport with AnyWordSpecLike with Matchers with DefaultPlayMongoRepositorySupport[DataModel] {
+class DataServiceSpec extends TestSupport with DefaultPlayMongoRepositorySupport[DataModel] {
 
   override lazy val repository: DataRepository = new DataRepository(mongoComponent, mockConfig)
   lazy val service = new DataService(repository)
 
-  val deleteError = MongoError("Failed to delete")
-  val updateError = MongoError("Update was unacknowledged")
-
   "The .update method" when {
 
-    "the data is valid" should {
+    "there is no existing matching record" should {
 
-      "ensure indexes are created" in {
-        await(repository.collection.listIndexes().toFuture()).size shouldBe 2
-      }
+      "add the data to the database and return an AcknowledgedUpdateResult with 0 matched and 0 modified" in {
+        val expected = UpdateResult.acknowledged(0, 0, Codecs.toBson(IdModel(testVatNumber, testStoreDataKey)))
 
-      "return MongoSuccess case object" in {
-        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe MongoSuccess
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe expected
+        await(repository.collection.countDocuments().toFuture()) shouldBe 1
       }
     }
 
-    "the data is invalid" should {
+    "there is an existing matching record with the same data" should {
 
-      "return MongoError case object" in {
-        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe
-          MongoError("Update was unacknowledged")
+      "return an AcknowledgedUpdateResult with 1 matched and 1 modified, and the same data as before" in {
+        val expected = UpdateResult.acknowledged(1, 1, null)
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe expected
+        await(service.getData(testVatNumber, testStoreDataKey)).get.data shouldBe testStoreDataJson
+        await(repository.collection.countDocuments().toFuture()) shouldBe 1
+      }
+    }
+
+    "there is an existing matching record with different data" should {
+
+      "return an AcknowledgedUpdateResult with 1 matched and 1 modified, with new data" in {
+        val expected = UpdateResult.acknowledged(1, 1, null)
+        val newJson = Json.obj("newField" -> "newValue")
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+
+        await(service.update(testVatNumber, testStoreDataKey, newJson)) shouldBe expected
+        await(service.getData(testVatNumber, testStoreDataKey)).get.data shouldBe newJson
+        await(repository.collection.countDocuments().toFuture()) shouldBe 1
       }
     }
   }
@@ -65,7 +79,7 @@ class DataServiceSpec extends TestSupport with AnyWordSpecLike with Matchers wit
       }
     }
 
-    "the query data is invalid" should {
+    "the query data is not found" should {
 
       "return None" in {
         await(service.getData(testVatNumber, testStoreDataKey)) shouldBe None
@@ -77,36 +91,53 @@ class DataServiceSpec extends TestSupport with AnyWordSpecLike with Matchers wit
 
     "a document is successfully deleted" should {
 
-      "return MongoSuccess case object" in {
-        await(service.removeData(testVatNumber, testStoreDataKey)) shouldBe MongoSuccess
+      "return an AcknowledgedDeleteResult with 1 deleted" in {
+        val expected = DeleteResult.acknowledged(1)
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+
+        await(service.removeData(testVatNumber, testStoreDataKey)) shouldBe expected
+        await(repository.collection.countDocuments().toFuture()) shouldBe 0
       }
     }
 
-    "the document cannot be deleted" should {
+    "the requested document cannot be found" should {
 
-      "return MongoError case object" in {
-        await(service.removeData(testVatNumber, testStoreDataKey)) shouldBe MongoError("Failed to delete")
+      "return an AcknowledgedDeleteResult with 0 deleted" in {
+        val expected = DeleteResult.acknowledged(0)
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+
+        await(service.removeData(testVatNumber, "unrecognisedKey")) shouldBe expected
+        await(repository.collection.countDocuments().toFuture()) shouldBe 1
       }
     }
   }
 
   "The .removeAll method" when {
 
-    "documents are successfully deleted" should {
+    "matching documents are found" should {
 
-      "return a MongoSuccess" in {
-        val result = {
-          await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
-          await(service.removeAll(testVatNumber))
-        }
-        result shouldBe MongoSuccess
+      "return an AcknowledgedDeleteResult with the number of matching documents deleted" in {
+        val expected = DeleteResult.acknowledged(2)
+        val differentKey = "differentKey"
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+        await(service.update(testVatNumber, differentKey, testStoreDataJson))
+
+        await(service.removeAll(testVatNumber)) shouldBe expected
+        await(repository.collection.countDocuments().toFuture()) shouldBe 0
       }
     }
 
-    "documents cannot be deleted" should {
+    "no matching documents are found" should {
 
-      "return MongoError case object" in {
-        await(service.removeAll(testVatNumber)) shouldBe deleteError
+      "return an AcknowledgedDeleteResult with 0 deleted" in {
+        val expected = DeleteResult.acknowledged(0)
+        val differentKey = "differentKey"
+        val unrecognisedVrn = "111111111"
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+        await(service.update(testVatNumber, differentKey, testStoreDataJson))
+
+        await(service.removeAll(unrecognisedVrn)) shouldBe expected
+        await(repository.collection.countDocuments().toFuture()) shouldBe 2
       }
     }
   }

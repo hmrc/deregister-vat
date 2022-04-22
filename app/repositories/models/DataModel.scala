@@ -16,9 +16,9 @@
 
 package repositories.models
 
-import java.time.Instant
-
 import play.api.libs.json._
+
+import java.time.Instant
 
 case class DataModel(_id: IdModel, data: JsValue)
 

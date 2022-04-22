@@ -22,7 +22,6 @@ import models.requests.User
 import models.responses.ErrorModel
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
-import repositories.models.{MongoError, MongoSuccess}
 import services.DataService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.LoggerUtil
@@ -47,11 +46,10 @@ class DataController @Inject()(VatAuthorised: VatAuthorised, dataService: DataSe
       case Right(data) =>
         logger.debug("[DataRepositoryController][storeData] Data parsed successfully, attempting to insert to Mongo")
         dataService.update(vrn, key, data) map {
-          case MongoSuccess => NoContent
-          case MongoError(err) => {
-            logger.debug(s"[DataRepositoryController][storeData] Error Returned from Mongo: $err")
+          case result if result.wasAcknowledged() => NoContent
+          case _ =>
+            logger.warn(s"[DataRepositoryController][storeData] Failed to insert or update data in mongo")
             InternalServerError(Json.toJson(ErrorModel("Error when adding data to Mongo Repository")))
-          }
         }
     }
   }
@@ -71,9 +69,9 @@ class DataController @Inject()(VatAuthorised: VatAuthorised, dataService: DataSe
   def removeData(vrn: String, key: String): Action[AnyContent] = VatAuthorised.async(vrn) { _ =>
     logger.debug(s"[DataRepositoryController][removeData] Attempting to delete data for vrn: $vrn and key: $key")
     dataService.removeData(vrn, key) map {
-      case MongoSuccess => NoContent
-      case MongoError(err) =>
-        logger.debug(s"[DataRepositoryController][removeData] Error Returned from Mongo: $err")
+      case result if result.wasAcknowledged() => NoContent
+      case _ =>
+        logger.warn(s"[DataRepositoryController][removeData] Failed to remove data from mongo")
         InternalServerError(Json.toJson(ErrorModel(s"Error when removing data for vrn: $vrn and key: $key")))
     }
   }
@@ -81,9 +79,9 @@ class DataController @Inject()(VatAuthorised: VatAuthorised, dataService: DataSe
   def removeAll(vrn: String): Action[AnyContent] = VatAuthorised.async(vrn) { _ =>
     logger.debug(s"[DataRepositoryController][removeAll] Attempting to delete all data for vrn: $vrn")
     dataService.removeAll(vrn) map {
-      case MongoSuccess => NoContent
-      case MongoError(err) =>
-        logger.debug(s"[DataRepositoryController][removeAll] Error Returned from Mongo: $err")
+      case result if result.wasAcknowledged() => NoContent
+      case _ =>
+        logger.warn(s"[DataRepositoryController][removeAll] Failed to remove data from mongo")
         InternalServerError(Json.toJson(ErrorModel(s"Error when removing all data for vrn: $vrn")))
     }
   }
