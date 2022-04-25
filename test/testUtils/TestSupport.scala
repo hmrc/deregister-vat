@@ -17,14 +17,16 @@
 package testUtils
 
 import com.typesafe.config.Config
+import config.AppConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext
 
 trait TestSupport extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with MockitoSugar
@@ -37,5 +39,7 @@ trait TestSupport extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite
   implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   implicit val config: Config = app.configuration.underlying
+
+  implicit val mockConfig = app.injector.instanceOf[AppConfig]
 
 }

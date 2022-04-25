@@ -16,7 +16,9 @@
 
 package assets
 
+import com.mongodb.client.result.{DeleteResult, UpdateResult}
 import config.Constants._
+import org.mongodb.scala.bson.BsonObjectId
 import play.api.libs.json.{JsValue, Json}
 import repositories.models.{DataModel, IdModel}
 import uk.gov.hmrc.auth.core.Enrolment
@@ -32,7 +34,12 @@ object BaseTestConstants {
   val testCredentials: Credentials = Credentials("GG123456789", "GG")
 
   val testStoreDataKey: String = "test"
-  val testStoreDataJson: JsValue = Json.obj("key" -> "value")
-  val testStoreDataModel = DataModel(IdModel(testVatNumber, testStoreDataKey), testStoreDataJson)
+  val testStoreDataJson: JsValue = Json.obj("field" -> "value")
 
+  val testStoreDataModel: DataModel = DataModel(IdModel(testVatNumber, testStoreDataKey), testStoreDataJson)
+
+  val successUpdateResult: UpdateResult = UpdateResult.acknowledged(1, 1, BsonObjectId())
+  val errorUpdateResult: UpdateResult = UpdateResult.unacknowledged()
+  val successDeleteResult: DeleteResult = DeleteResult.acknowledged(1)
+  val errorDeleteResult: DeleteResult = DeleteResult.unacknowledged()
 }

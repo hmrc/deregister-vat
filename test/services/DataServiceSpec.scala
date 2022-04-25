@@ -17,51 +17,72 @@
 package services
 
 import assets.BaseTestConstants._
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpecLike
+import com.mongodb.client.result.{DeleteResult, UpdateResult}
+import play.api.libs.json.Json
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import repositories.mocks.MockDataRepository
-import repositories.models.{DataModel, IdModel, MongoError, MongoSuccess}
-import scala.concurrent.Future
+import repositories.DataRepository
+import repositories.models.{DataModel, IdModel}
+import testUtils.TestSupport
+import uk.gov.hmrc.mongo.play.json.Codecs
+import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
-class DataServiceSpec extends MockDataRepository with AnyWordSpecLike with Matchers {
+class DataServiceSpec extends TestSupport with DefaultPlayMongoRepositorySupport[DataModel] {
 
-  object TestDataService extends DataService(mockDataRepository)
+  override lazy val repository: DataRepository = new DataRepository(mongoComponent, mockConfig)
+  lazy val service = new DataService(repository)
 
   "The .update method" when {
 
-    "a successful response is returned from the Mongo insert" should {
+    "there is no existing matching record" should {
 
-      "return MongoSuccess case object" in {
-        mockAddEntry(DataModel(IdModel(testVatNumber, testStoreDataKey), testStoreDataJson))(Future(successUpdateWriteResult))
-        await(TestDataService.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe MongoSuccess
+      "add the data to the database and return an AcknowledgedUpdateResult with 0 matched and 0 modified" in {
+        val expected = UpdateResult.acknowledged(0, 0, Codecs.toBson(IdModel(testVatNumber, testStoreDataKey)))
+
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe expected
+        await(repository.collection.countDocuments().toFuture()) shouldBe 1
       }
     }
 
-    "an error response is returned from the Mongo insert" should {
+    "there is an existing matching record with the same data" should {
 
-      "return MongoError case object" in {
-        mockAddEntry(DataModel(IdModel(testVatNumber, testStoreDataKey), testStoreDataJson))(errorResult)
-        await(TestDataService.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe MongoError(errMsg)
+      "return an AcknowledgedUpdateResult with 1 matched and 1 modified, and the same data as before" in {
+        val expected = UpdateResult.acknowledged(1, 1, null)
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson)) shouldBe expected
+        await(service.getData(testVatNumber, testStoreDataKey)).get.data shouldBe testStoreDataJson
+        await(repository.collection.countDocuments().toFuture()) shouldBe 1
+      }
+    }
+
+    "there is an existing matching record with different data" should {
+
+      "return an AcknowledgedUpdateResult with 1 matched and 1 modified, with new data" in {
+        val expected = UpdateResult.acknowledged(1, 1, null)
+        val newJson = Json.obj("newField" -> "newValue")
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+
+        await(service.update(testVatNumber, testStoreDataKey, newJson)) shouldBe expected
+        await(service.getData(testVatNumber, testStoreDataKey)).get.data shouldBe newJson
+        await(repository.collection.countDocuments().toFuture()) shouldBe 1
       }
     }
   }
 
   "The .getData method" when {
 
-    "a document is returned from the Mongo findById method" should {
+    "the query data is valid" should {
 
-      "return MongoSuccess case object" in {
-        mockFindById(IdModel(testVatNumber, testStoreDataKey))(Some(testStoreDataModel))
-        await(TestDataService.getData(testVatNumber, testStoreDataKey)) shouldBe Some(testStoreDataModel)
+      "return the correct data model" in {
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+        await(service.getData(testVatNumber, testStoreDataKey)) shouldBe Some(testStoreDataModel)
       }
     }
 
-    "no document is returned from the Mongo findById method" should {
+    "the query data is not found" should {
 
-      "return MongoError case object" in {
-        mockFindById(IdModel(testVatNumber, testStoreDataKey))(None)
-        await(TestDataService.getData(testVatNumber, testStoreDataKey)) shouldBe None
+      "return None" in {
+        await(service.getData(testVatNumber, testStoreDataKey)) shouldBe None
       }
     }
   }
@@ -70,36 +91,53 @@ class DataServiceSpec extends MockDataRepository with AnyWordSpecLike with Match
 
     "a document is successfully deleted" should {
 
-      "return MongoSuccess case object" in {
-        mockRemoveById(IdModel(testVatNumber, testStoreDataKey))(Future(successWriteResult))
-        await(TestDataService.removeData(testVatNumber, testStoreDataKey)) shouldBe MongoSuccess
+      "return an AcknowledgedDeleteResult with 1 deleted" in {
+        val expected = DeleteResult.acknowledged(1)
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+
+        await(service.removeData(testVatNumber, testStoreDataKey)) shouldBe expected
+        await(repository.collection.countDocuments().toFuture()) shouldBe 0
       }
     }
 
-    "an error is returned from mongo" should {
+    "the requested document cannot be found" should {
 
-      "return MongoError case object" in {
-        mockRemoveById(IdModel(testVatNumber, testStoreDataKey))(errorResult)
-        await(TestDataService.removeData(testVatNumber, testStoreDataKey)) shouldBe MongoError(errMsg)
+      "return an AcknowledgedDeleteResult with 0 deleted" in {
+        val expected = DeleteResult.acknowledged(0)
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+
+        await(service.removeData(testVatNumber, "unrecognisedKey")) shouldBe expected
+        await(repository.collection.countDocuments().toFuture()) shouldBe 1
       }
     }
   }
 
   "The .removeAll method" when {
 
-    "documents are successfully deleted" should {
+    "matching documents are found" should {
 
-      "return MongoSuccess case object" in {
-        mockRemove(Future(successWriteResult))
-        await(TestDataService.removeAll(testVatNumber)) shouldBe MongoSuccess
+      "return an AcknowledgedDeleteResult with the number of matching documents deleted" in {
+        val expected = DeleteResult.acknowledged(2)
+        val differentKey = "differentKey"
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+        await(service.update(testVatNumber, differentKey, testStoreDataJson))
+
+        await(service.removeAll(testVatNumber)) shouldBe expected
+        await(repository.collection.countDocuments().toFuture()) shouldBe 0
       }
     }
 
-    "an error is returned from mongo" should {
+    "no matching documents are found" should {
 
-      "return MongoError case object" in {
-        mockRemove(errorResult)
-        await(TestDataService.removeAll(testVatNumber)) shouldBe MongoError(errMsg)
+      "return an AcknowledgedDeleteResult with 0 deleted" in {
+        val expected = DeleteResult.acknowledged(0)
+        val differentKey = "differentKey"
+        val unrecognisedVrn = "111111111"
+        await(service.update(testVatNumber, testStoreDataKey, testStoreDataJson))
+        await(service.update(testVatNumber, differentKey, testStoreDataJson))
+
+        await(service.removeAll(unrecognisedVrn)) shouldBe expected
+        await(repository.collection.countDocuments().toFuture()) shouldBe 2
       }
     }
   }

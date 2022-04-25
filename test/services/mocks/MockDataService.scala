@@ -16,11 +16,12 @@
 
 package services.mocks
 
-import org.mockito.ArgumentMatchers
+import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing
+import org.mongodb.scala.result.{DeleteResult, UpdateResult}
 import play.api.libs.json.JsValue
-import repositories.models.{DataModel, MongoResponse}
+import repositories.models.DataModel
 import services.DataService
 import testUtils.TestSupport
 
@@ -35,21 +36,19 @@ trait MockDataService extends TestSupport {
 
   val mockDataService: DataService = mock[DataService]
 
-  def mockAddEntry(vrn: String, key: String, json: JsValue)(response: MongoResponse): OngoingStubbing[Future[MongoResponse]] =
-    when(mockDataService.update(ArgumentMatchers.eq(vrn),ArgumentMatchers.eq(key),ArgumentMatchers.eq(json)))
+  def mockAddEntry(vrn: String, key: String, json: JsValue)(response: UpdateResult): OngoingStubbing[Future[UpdateResult]] =
+    when(mockDataService.update(Matchers.eq(vrn),Matchers.eq(key),Matchers.eq(json)))
       .thenReturn(Future.successful(response))
 
-  def mockRemoveData(vrn: String, key: String)(response: MongoResponse): OngoingStubbing[Future[MongoResponse]] =
-    when(mockDataService.removeData(ArgumentMatchers.eq(vrn), ArgumentMatchers.eq(key)))
+  def mockRemoveData(vrn: String, key: String)(response: DeleteResult): OngoingStubbing[Future[DeleteResult]] =
+    when(mockDataService.removeData(Matchers.eq(vrn), Matchers.eq(key)))
       .thenReturn(Future.successful(response))
 
   def mockGetData(vrn: String, key: String)(response: Option[DataModel]): OngoingStubbing[Future[Option[DataModel]]] =
-    when(mockDataService.getData(ArgumentMatchers.eq(vrn), ArgumentMatchers.eq(key)))
+    when(mockDataService.getData(Matchers.eq(vrn), Matchers.eq(key)))
       .thenReturn(Future.successful(response))
 
-  def mockRemove(vrn: String)(response: MongoResponse): OngoingStubbing[Future[MongoResponse]] =
-    when(mockDataService.removeAll(ArgumentMatchers.eq(vrn)))
+  def mockRemoveAll(vrn: String)(response: DeleteResult): OngoingStubbing[Future[DeleteResult]] =
+    when(mockDataService.removeAll(Matchers.eq(vrn)))
       .thenReturn(Future.successful(response))
-
-
 }

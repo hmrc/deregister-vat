@@ -17,7 +17,7 @@
 package connectors.mocks
 
 import assets.BaseTestConstants._
-import org.mockito.ArgumentMatchers
+import org.mockito.Matchers
 import org.mockito.Mockito._
 import testUtils.TestSupport
 import uk.gov.hmrc.auth.core.authorise.{EmptyPredicate, Predicate}
@@ -37,11 +37,11 @@ trait MockAuthConnector extends TestSupport {
                       )(response: Future[T]): Unit = {
     when(
       mockAuthConnector.authorise(
-        ArgumentMatchers.eq(predicate),
-        ArgumentMatchers.eq(retrievals)
+        Matchers.eq(predicate),
+        Matchers.eq(retrievals)
       )(
-        ArgumentMatchers.any[HeaderCarrier],
-        ArgumentMatchers.any[ExecutionContext])
+        Matchers.any[HeaderCarrier],
+        Matchers.any[ExecutionContext])
     ) thenReturn response
   }
 

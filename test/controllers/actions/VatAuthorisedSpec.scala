@@ -30,9 +30,9 @@ import scala.concurrent.Future
 class VatAuthorisedSpec extends MockAuthConnector {
 
   val cc: ControllerComponents = stubControllerComponents()
-  object TestVatAuthorised extends VatAuthorised(mockAuthConnector, cc)
+  lazy val testVatAuthorised = new VatAuthorised(mockAuthConnector, cc)
 
-  def result: Future[Result] = TestVatAuthorised.async(testVatNumber) {
+  def result: Future[Result] = testVatAuthorised.async(testVatNumber) {
     _ => Future.successful(Ok)
   }(ec)(fakeRequest)
 

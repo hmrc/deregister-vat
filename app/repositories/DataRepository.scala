@@ -16,53 +16,43 @@
 
 package repositories
 
+import java.util.concurrent.TimeUnit
+
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{Format, Json}
-import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.api.commands.UpdateWriteResult
-import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.BSONDocument
+import org.mongodb.scala.model.Indexes.ascending
+import org.mongodb.scala.model.{IndexModel, IndexOptions}
+import play.api.libs.json.Format
 import repositories.models._
-import reactivemongo.play.json._
-import uk.gov.hmrc.mongo.ReactiveRepository
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class DataRepository @Inject()(mongo: ReactiveMongoComponent,
+class DataRepository @Inject()(mongo: MongoComponent,
                                appConfig: AppConfig)(implicit ec: ExecutionContext)
-  extends ReactiveRepository[DataModel, IdModel](
-    "deregData",
-    mongo.mongoConnector.db,
-    implicitly[Format[DataModel]],
-    implicitly[Format[IdModel]]
+  extends PlayMongoRepository[DataModel](
+    mongoComponent = mongo,
+    collectionName = "deregData",
+    domainFormat = implicitly[Format[DataModel]],
+    indexes = Seq(
+      IndexModel(
+        ascending(DataModel.creationTimestamp),
+        IndexOptions()
+          .name("deregDataExpires")
+          .expireAfter(appConfig.timeToLiveSeconds, TimeUnit.SECONDS)
+          .unique(false)
+          .background(false)
+          .sparse(false)
+      ),
+      IndexModel(
+        ascending(s"${DataModel._id}.${IdModel.vrn}"),
+        IndexOptions().name("VRNIndex")
+      )
+    ),
+    replaceIndexes = true
   ) {
 
-  val creationTimestampKey = "creationTimestamp"
-
-  private lazy val ttlIndex = Index(
-    Seq((creationTimestampKey, IndexType.Ascending)),
-    name = Some("deregDataExpires"),
-    unique = false,
-    background = false,
-    dropDups = false,
-    sparse = false,
-    version = None,
-    options = BSONDocument("expireAfterSeconds" -> appConfig.timeToLiveSeconds)
-  )
-
-  private def setIndex(): Unit = {
-    collection.indexesManager.drop(ttlIndex.name.get) onComplete {
-      _ => collection.indexesManager.ensure(ttlIndex)
-    }
-  }
-
-  setIndex()
-
-  def upsert(data: DataModel): Future[UpdateWriteResult] = {
-    val selector = Json.obj(DataModel._id -> data._id)
-    collection.update(ordered = false).one(selector, data, upsert = true)
-  }
-
+  collection.createIndexes(indexes)
 }

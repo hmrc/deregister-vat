@@ -16,35 +16,38 @@
 
 package services
 
-import javax.inject.{Inject, Singleton}
+import org.mongodb.scala.model.Filters.equal
+import org.mongodb.scala.model.ReplaceOptions
+import org.mongodb.scala.result.{DeleteResult, UpdateResult}
 import play.api.libs.json.JsValue
-import reactivemongo.api.commands.WriteResult
 import repositories.DataRepository
 import repositories.models._
+import uk.gov.hmrc.mongo.play.json.Codecs
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.Future
 
 @Singleton()
-class DataService @Inject()(dataRepository: DataRepository)(implicit ec: ExecutionContext) {
+class DataService @Inject()(dataRepository: DataRepository) {
 
-  private def handleResult: Future[WriteResult] => Future[MongoResponse] = _ map {
-    _ => MongoSuccess
-  } recover {
-    case err => MongoError(err.getMessage)
-  }
-
-  def update(vrn: String, key: String, data: JsValue): Future[MongoResponse] = {
+  def update(vrn: String, key: String, data: JsValue): Future[UpdateResult] = {
     val document = DataModel(IdModel(vrn, key), data)
-    handleResult(dataRepository.upsert(document))
+    val filter = equal(DataModel._id, Codecs.toBson(document._id))
+    dataRepository.collection.replaceOne(filter, document, ReplaceOptions().upsert(true)).toFuture()
   }
 
-  def removeData(vrn: String, key: String): Future[MongoResponse] =
-    handleResult(dataRepository.removeById(IdModel(vrn, key)))
+  def removeData(vrn: String, key: String): Future[DeleteResult] =
+    dataRepository.collection.deleteOne(
+      equal(DataModel._id, Codecs.toBson(IdModel(vrn, key)))
+    ).toFuture()
 
-  def removeAll(vrn: String): Future[MongoResponse] = {
-    handleResult(dataRepository.remove(s"${DataModel._id}.${IdModel.vrn}" -> vrn))
-  }
+  def removeAll(vrn: String): Future[DeleteResult] =
+    dataRepository.collection.deleteMany(
+      equal(s"${DataModel._id}.${IdModel.vrn}", vrn)
+    ).toFuture()
 
   def getData(vrn: String, key: String): Future[Option[DataModel]] =
-    dataRepository.findById(IdModel(vrn, key))
+    dataRepository.collection.find(
+      equal(DataModel._id, Codecs.toBson(IdModel(vrn, key)))
+    ).first().toFutureOption()
 }
