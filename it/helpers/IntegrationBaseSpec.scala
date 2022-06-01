@@ -72,5 +72,5 @@ trait IntegrationBaseSpec extends AnyWordSpecLike
 
   def buildRequest(path: String): WSRequest =
     client.url(s"http://localhost:$port$appRouteContext$path")
-      .withFollowRedirects(false)
+      .withHttpHeaders("Authorization" -> "localToken").withFollowRedirects(false)
 }
