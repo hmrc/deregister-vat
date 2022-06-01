@@ -51,7 +51,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 val compile = Seq(
   "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28" % "0.62.0",
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.18.0"
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.24.0"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
@@ -83,7 +83,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     Keys.fork in Test := true,
     javaOptions in Test += "-Dlogger.resource=logback-test.xml",
-    scalaVersion := "2.12.14",
+    scalaVersion := "2.12.15",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     PlayKeys.playDefaultPort := 9164,
