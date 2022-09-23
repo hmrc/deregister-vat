@@ -55,9 +55,6 @@ val compile = Seq(
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc"             %% "bootstrap-test-play-28"     % "7.3.0"             % scope,
-  "org.pegdown"             % "pegdown"                     % "1.6.0"             % scope,
-  "com.github.tomakehurst"  % "wiremock-jre8"               % "2.26.3"            % scope,
-  "com.vladsch.flexmark"    % "flexmark-all"                % "0.36.8"            % scope,
   "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-M2"          % scope,
   "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-28"    % "0.73.0"            % scope
 )
