@@ -2,9 +2,15 @@
 
 [![Build Status](https://travis-ci.org/hmrc/deregister-vat.svg)](https://travis-ci.org/hmrc/deregister-vat) [![Download](https://api.bintray.com/packages/hmrc/releases/deregister-vat/images/download.svg)](https://bintray.com/hmrc/releases/deregister-vat/_latestVersion)
 
-This service provides backend functionality to support the Deregister VAT Frontend Microservice.
+This service provides backend functionality to support the deregister-vat-frontend microservice.
 
-It's primary purpose is to support the Storage and Retrieval of Session Data that is captured by the frontend from the User
+Its primary purpose is to support the storage and retrieval of session data that is captured by the frontend from the user.
+
+## Running
+
+In order to run this microservice, you must have SBT installed. You should then be able to start the application using:
+
+`./run.sh`
 
 ## Endpoints
 
@@ -14,7 +20,7 @@ It's primary purpose is to support the Storage and Retrieval of Session Data tha
 
 Allows the `deregister-vat-frontend` microservice to store key value data captured during the user journey.
 
-The endpoint is idempotent, if a records already exists for the supplied vrn and key then the document is updated with the payload supplied. If the document does not exist, it is inserted. Both scenarios will return a NO_CONTENT response if successful.
+The endpoint is idempotent. If a record already exists for the supplied VRN and key then the document is updated with the payload supplied. If the document does not exist, it is inserted. Both scenarios will return a NO_CONTENT response if successful.
   
 *  **URL Params**
 
