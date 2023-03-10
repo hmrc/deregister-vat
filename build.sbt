@@ -18,7 +18,6 @@ import play.sbt.routes.RoutesKeys
 import sbt.Tests.{Group, SubProcess}
 import uk.gov.hmrc.DefaultBuildSettings._
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 val appName: String = "deregister-vat"
@@ -37,7 +36,6 @@ lazy val coverageSettings: Seq[Setting[_]] = {
     "app.*",
     "prod.*",
     "config.*",
-    "testOnlyDoNotUseInAppConf.*"
   )
 
   Seq(
@@ -72,7 +70,6 @@ lazy val microservice = Project(appName, file("."))
   .settings(coverageSettings: _*)
   .settings(playSettings: _*)
   .settings(scalaSettings: _*)
-  .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(
