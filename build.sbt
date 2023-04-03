@@ -21,7 +21,7 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 val appName: String = "deregister-vat"
-val mongoPlayVersion = "0.74.0"
+val mongoPlayVersion = "1.1.0"
 
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins: Seq[Plugins] = Seq.empty
@@ -49,11 +49,11 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 val compile = Seq(
   "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28" % mongoPlayVersion,
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "7.14.0"
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "7.15.0"
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc"             %% "bootstrap-test-play-28"     % "7.14.0"            % scope,
+  "uk.gov.hmrc"             %% "bootstrap-test-play-28"     % "7.15.0"            % scope,
   "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-M2"          % scope,
   "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-28"    % mongoPlayVersion    % scope
 )
