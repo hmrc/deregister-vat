@@ -21,7 +21,7 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 val appName: String = "deregister-vat"
-val mongoPlayVersion = "1.1.0"
+val mongoPlayVersion = "1.2.0"
 
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins: Seq[Plugins] = Seq.empty
