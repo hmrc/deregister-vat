@@ -40,6 +40,6 @@ trait TestSupport extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite
 
   implicit val config: Config = app.configuration.underlying
 
-  implicit val mockConfig = app.injector.instanceOf[AppConfig]
+  implicit val mockConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
 }
