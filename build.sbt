@@ -21,7 +21,10 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 val appName: String = "deregister-vat"
-val mongoPlayVersion = "1.2.0"
+val mongoPlayVersion = "1.7.0"
+val bootstrapVersion = "8.4.0"
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "2.13.12"
 
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins: Seq[Plugins] = Seq.empty
@@ -47,15 +50,15 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 }
 
 val compile = Seq(
-  "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28" % mongoPlayVersion,
+  "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30" % mongoPlayVersion,
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "7.15.0"
+  "uk.gov.hmrc" %% "bootstrap-test-play-30" % bootstrapVersion
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc"             %% "bootstrap-test-play-28"     % "7.15.0"            % scope,
+  "uk.gov.hmrc"             %% "bootstrap-test-play-30"     % bootstrapVersion            % scope,
   "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-M2"          % scope,
-  "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-28"    % mongoPlayVersion    % scope
+  "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30"    % mongoPlayVersion    % scope
 )
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {
@@ -71,11 +74,9 @@ lazy val microservice = Project(appName, file("."))
   .settings(playSettings: _*)
   .settings(scalaSettings: _*)
   .settings(defaultSettings(): _*)
-  .settings(majorVersion := 0)
   .settings(
     Test / Keys.fork := true,
     Test / javaOptions += "-Dlogger.resource=logback-test.xml",
-    scalaVersion := "2.13.8",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     PlayKeys.playDefaultPort := 9164,
