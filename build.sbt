@@ -52,11 +52,11 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 val compile = Seq(
   "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30" % mongoPlayVersion,
   ws,
-  "uk.gov.hmrc" %% "bootstrap-test-play-30" % bootstrapVersion
+  "uk.gov.hmrc" %% "bootstrap-backend-play-30" % bootstrapVersion
 )
 
 def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc"             %% "bootstrap-test-play-30"     % bootstrapVersion            % scope,
+  "uk.gov.hmrc"             %% "bootstrap-test-play-30"     % bootstrapVersion    % scope,
   "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-M2"          % scope,
   "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30"    % mongoPlayVersion    % scope
 )
