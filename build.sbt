@@ -83,7 +83,6 @@ lazy val it = project
   .settings(itSettings())
   .settings(
     fork := false,
-    addTestReportOption(Test, "int-test-reports"),
-    Test / testGrouping := oneForkedJvmPerTest((Test / definedTests).value)
+    addTestReportOption(Test, "int-test-reports")
   )
 
