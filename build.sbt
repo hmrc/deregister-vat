@@ -21,7 +21,7 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 val appName: String = "deregister-vat"
-val mongoPlayVersion = "1.7.0"
+val mongoPlayVersion = "2.1.0"
 val bootstrapVersion = "8.4.0"
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "2.13.12"
