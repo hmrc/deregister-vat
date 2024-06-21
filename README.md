@@ -200,3 +200,8 @@ Allows the `deregister-vat-frontend` microservice to delete all stored key value
 ## License
   
  This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
+
+
+
+## Testing
+`sbt clean coverage test it/test coverageReport`

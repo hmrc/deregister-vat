@@ -55,7 +55,7 @@ val compile = Seq(
   "uk.gov.hmrc" %% "bootstrap-backend-play-30" % bootstrapVersion
 )
 
-def test(scope: String = "test,it"): Seq[ModuleID] = Seq(
+def test(scope: String = "test"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc"             %% "bootstrap-test-play-30"     % bootstrapVersion    % scope,
   "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-M2"          % scope,
   "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30"    % mongoPlayVersion    % scope
@@ -76,12 +76,14 @@ lazy val microservice = Project(appName, file("."))
     PlayKeys.playDefaultPort := 9164,
     RoutesKeys.routesImport := Seq.empty
   )
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+
+lazy val it = project
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "test->test")
+  .settings(itSettings())
   .settings(
-    IntegrationTest / Keys.fork := false,
-    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory) (base => Seq(base / "it")).value,
-    IntegrationTest / resourceDirectory := baseDirectory.value / "it" / "resources",
-    addTestReportOption(IntegrationTest, "int-test-reports"),
-    IntegrationTest / parallelExecution := false
+    fork := false,
+    addTestReportOption(Test, "int-test-reports"),
+    Test / testGrouping := oneForkedJvmPerTest((Test / definedTests).value)
   )
+

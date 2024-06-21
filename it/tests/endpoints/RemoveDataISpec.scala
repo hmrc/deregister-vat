@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package endpoints
+package tests.endpoints
 
-import helpers.IntegrationBaseSpec
 import play.api.libs.ws.WSResponse
-import stubs.AuthStub
+import tests.helpers.IntegrationBaseSpec
+import tests.stubs.AuthStub
 
-class RemoveAllDataISpec extends IntegrationBaseSpec {
+class RemoveDataISpec extends IntegrationBaseSpec {
 
-  val path = "/data/123456789"
+  val path = "/data/123456789/testKey"
 
-  "DELETE /data/:vrn" when {
+  "DELETE /data/:vrn/:key" when {
 
     "user is authorised" when {
 
