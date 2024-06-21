@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package helpers
+package tests.helpers
 
 import org.scalatest._
 import org.scalatest.wordspec.AnyWordSpecLike

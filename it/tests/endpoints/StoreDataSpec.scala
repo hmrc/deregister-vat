@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package endpoints
+package tests.endpoints
 
-import helpers.IntegrationBaseSpec
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSResponse
-import stubs.AuthStub
+import tests.helpers.IntegrationBaseSpec
+import tests.stubs.AuthStub
 
 class StoreDataSpec extends IntegrationBaseSpec {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package services.mocks
 
-import org.mockito.Matchers
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing
 import org.mongodb.scala.result.{DeleteResult, UpdateResult}
@@ -37,18 +37,18 @@ trait MockDataService extends TestSupport {
   val mockDataService: DataService = mock[DataService]
 
   def mockAddEntry(vrn: String, key: String, json: JsValue)(response: UpdateResult): OngoingStubbing[Future[UpdateResult]] =
-    when(mockDataService.update(Matchers.eq(vrn),Matchers.eq(key),Matchers.eq(json)))
+    when(mockDataService.update(ArgumentMatchers.eq(vrn),ArgumentMatchers.eq(key),ArgumentMatchers.eq(json)))
       .thenReturn(Future.successful(response))
 
   def mockRemoveData(vrn: String, key: String)(response: DeleteResult): OngoingStubbing[Future[DeleteResult]] =
-    when(mockDataService.removeData(Matchers.eq(vrn), Matchers.eq(key)))
+    when(mockDataService.removeData(ArgumentMatchers.eq(vrn), ArgumentMatchers.eq(key)))
       .thenReturn(Future.successful(response))
 
   def mockGetData(vrn: String, key: String)(response: Option[DataModel]): OngoingStubbing[Future[Option[DataModel]]] =
-    when(mockDataService.getData(Matchers.eq(vrn), Matchers.eq(key)))
+    when(mockDataService.getData(ArgumentMatchers.eq(vrn), ArgumentMatchers.eq(key)))
       .thenReturn(Future.successful(response))
 
   def mockRemoveAll(vrn: String)(response: DeleteResult): OngoingStubbing[Future[DeleteResult]] =
-    when(mockDataService.removeAll(Matchers.eq(vrn)))
+    when(mockDataService.removeAll(ArgumentMatchers.eq(vrn)))
       .thenReturn(Future.successful(response))
 }

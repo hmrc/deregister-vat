@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package connectors.mocks
 
 import assets.BaseTestConstants._
-import org.mockito.Matchers
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import testUtils.TestSupport
 import uk.gov.hmrc.auth.core.authorise.{EmptyPredicate, Predicate}
@@ -37,11 +37,11 @@ trait MockAuthConnector extends TestSupport {
                       )(response: Future[T]): Unit = {
     when(
       mockAuthConnector.authorise(
-        Matchers.eq(predicate),
-        Matchers.eq(retrievals)
+        ArgumentMatchers.eq(predicate),
+        ArgumentMatchers.eq(retrievals)
       )(
-        Matchers.any[HeaderCarrier],
-        Matchers.any[ExecutionContext])
+        ArgumentMatchers.any[HeaderCarrier],
+        ArgumentMatchers.any[ExecutionContext])
     ) thenReturn response
   }
 
