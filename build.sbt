@@ -15,8 +15,7 @@
  */
 
 import play.sbt.routes.RoutesKeys
-import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.DefaultBuildSettings._
+import uk.gov.hmrc.DefaultBuildSettings.*
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
@@ -24,13 +23,13 @@ val appName: String = "deregister-vat"
 val mongoPlayVersion = "2.1.0"
 val bootstrapVersion = "8.4.0"
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "2.13.16"
 
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins: Seq[Plugins] = Seq.empty
-lazy val playSettings: Seq[Setting[_]] = Seq.empty
+lazy val playSettings: Seq[Setting[?]] = Seq.empty
 
-lazy val coverageSettings: Seq[Setting[_]] = {
+lazy val coverageSettings: Seq[Setting[?]] = {
   import scoverage.ScoverageKeys
 
   val excludedPackages = Seq(
@@ -57,17 +56,17 @@ val compile = Seq(
 
 def test(scope: String = "test"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc"             %% "bootstrap-test-play-30"     % bootstrapVersion    % scope,
-  "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-M2"          % scope,
+  "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-SNAP5"          % scope,
   "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30"    % mongoPlayVersion    % scope
 )
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(Seq(play.sbt.PlayScala, SbtDistributablesPlugin) ++ plugins: _*)
+  .enablePlugins((Seq(play.sbt.PlayScala, SbtDistributablesPlugin) ++ plugins) *)
   .settings(PlayKeys.playDefaultPort := 9164)
-  .settings(coverageSettings: _*)
-  .settings(playSettings: _*)
-  .settings(scalaSettings: _*)
-  .settings(defaultSettings(): _*)
+  .settings(coverageSettings *)
+  .settings(playSettings *)
+  .settings(scalaSettings *)
+  .settings(defaultSettings() *)
   .settings(
     Test / Keys.fork := true,
     Test / javaOptions += "-Dlogger.resource=logback-test.xml",
@@ -76,6 +75,7 @@ lazy val microservice = Project(appName, file("."))
     PlayKeys.playDefaultPort := 9164,
     RoutesKeys.routesImport := Seq.empty
   )
+  .settings(scalacOptions ++= Seq("-Wconf:cat=unused-imports&src=routes/.*:s", "-Wconf:cat=unused&src=routes/.*:s"))
 
 lazy val it = project
   .enablePlugins(PlayScala)
