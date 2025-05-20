@@ -36,3 +36,5 @@ tmp
 bin
 .bsp
 migrations/*.sh
+.metals/
+.vscode/
