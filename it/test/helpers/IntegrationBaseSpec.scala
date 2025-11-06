@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tests.helpers
+package helpers
 
 import org.scalatest._
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -41,7 +41,10 @@ trait IntegrationBaseSpec extends AnyWordSpecLike
 
   override lazy val client: WSClient = app.injector.instanceOf[WSClient]
 
-  def servicesConfig: Map[String, String] = Map()
+  def servicesConfig: Map[String, String] = Map(
+//    "microservice.services.auth.host" -> mockHost,
+//    "microservice.services.auth.port" -> mockPort
+  )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))

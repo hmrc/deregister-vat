@@ -14,43 +14,43 @@
  * limitations under the License.
  */
 
-package tests.endpoints
+package endpoints
 
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSResponse
-import tests.helpers.IntegrationBaseSpec
-import tests.stubs.AuthStub
+import helpers.IntegrationBaseSpec
+import stubs.AuthStub
 
-class GetDataSpec extends IntegrationBaseSpec {
+class StoreDataSpec extends IntegrationBaseSpec {
 
   val path = "/data/123456789/testKey"
-  val invalidPath = "/data/12345678901/testKey2"
+  val invalidPath = "/data/123456789/testKey2"
 
   val body: JsValue = Json.parse("""{"forename" : "john"}""")
 
-  "GET /data/:vrn/:key" when {
+  "PUT /data/:vrn/:key" when {
 
     "the user is authorised" when {
 
-      "mongo successful receives the data" should {
+      "mongo successful receives the sent data" should {
 
-        "get a 200 response and the correct JSON body" in {
+        "get a 204 response and no body is returned" in {
 
           AuthStub.authorised()
-          put(path)(body)
-          val response: WSResponse = get(path)
-          response.status shouldBe 200
-          response.body shouldBe "{\"forename\":\"john\"}"
+          val response: WSResponse = put(path)(body)
+          response.status shouldBe 204
+          response.body shouldBe ""
 
         }
+
       }
-      "user is unsuccessful" should {
+      "user is trying to add a currently existing record" should {
 
-        "get a 404 response and the correct error message" in {
+        "get a 204 response and no body returned" in {
 
-          val response: WSResponse = get(invalidPath)
-          response.status shouldBe 404
-          response.body shouldBe "{\"message\":\"No data found for vrn: 12345678901 and key: testKey2\"}"
+          val response: WSResponse = put(invalidPath)(body)
+          response.status shouldBe 204
+          response.body shouldBe ""
 
         }
       }
@@ -58,10 +58,10 @@ class GetDataSpec extends IntegrationBaseSpec {
 
     "user is unauthorised" should {
 
-      "get a 401 response and no body is returned" in {
+      "get a 401 response and no body is returned " in {
 
         AuthStub.unauthenticated()
-        val response: WSResponse = get(path)
+        val response: WSResponse = put(path)(body)
         response.status shouldBe 401
         response.body shouldBe ""
 
@@ -74,12 +74,11 @@ class GetDataSpec extends IntegrationBaseSpec {
       "get a 403 response and no body is returned" in {
 
         AuthStub.forbidden()
-        val response: WSResponse = get(path)
+        val response: WSResponse = put(path)(body)
         response.status shouldBe 403
         response.body shouldBe ""
 
       }
-
     }
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tests.helpers
+package helpers
 
 import com.github.tomakehurst.wiremock.client.MappingBuilder
 import com.github.tomakehurst.wiremock.client.WireMock._
