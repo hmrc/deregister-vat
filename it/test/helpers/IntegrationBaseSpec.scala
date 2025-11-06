@@ -41,14 +41,8 @@ trait IntegrationBaseSpec extends AnyWordSpecLike
 
   override lazy val client: WSClient = app.injector.instanceOf[WSClient]
 
-  def servicesConfig: Map[String, String] = Map(
-//    "microservice.services.auth.host" -> mockHost,
-//    "microservice.services.auth.port" -> mockPort
-  )
-
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
-    .configure(servicesConfig)
     .build()
 
   override def beforeAll(): Unit = {
