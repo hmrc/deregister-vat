@@ -15,15 +15,16 @@
  */
 
 import play.sbt.routes.RoutesKeys
+import uk.gov.hmrc.DefaultBuildSettings
 import uk.gov.hmrc.DefaultBuildSettings.*
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 val appName: String = "deregister-vat"
-val mongoPlayVersion = "2.6.0"
-val bootstrapVersion = "8.6.0"
+val mongoPlayVersion = "2.10.0"
+val bootstrapVersion = "10.4.0"
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "2.13.17"
 
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins: Seq[Plugins] = Seq.empty
@@ -56,7 +57,7 @@ val compile = Seq(
 
 def test(scope: String = "test"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc"             %% "bootstrap-test-play-30"     % bootstrapVersion    % scope,
-  "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-SNAP5"          % scope,
+  "org.scalatestplus"       %% "scalatestplus-mockito"      % "1.0.0-M2"          % scope,
   "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30"    % mongoPlayVersion    % scope
 )
 
@@ -68,7 +69,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(scalaSettings *)
   .settings(defaultSettings() *)
   .settings(
-    Test / Keys.fork := true,
+    Test / Keys.fork := false,
     Test / javaOptions += "-Dlogger.resource=logback-test.xml",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
@@ -80,9 +81,11 @@ lazy val microservice = Project(appName, file("."))
 lazy val it = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test")
-  .settings(itSettings())
+  .settings(DefaultBuildSettings.itSettings())
   .settings(
-    fork := false,
-    addTestReportOption(Test, "int-test-reports")
+    Test / fork := false,
+    libraryDependencies ++= appDependencies,
+    Test / resourceDirectory := baseDirectory.value / "resources",
+    addTestReportOption(Test, "int-test-reports"),
   )
 

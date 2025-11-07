@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package tests.endpoints
+package endpoints
 
 import play.api.libs.ws.WSResponse
-import tests.helpers.IntegrationBaseSpec
-import tests.stubs.AuthStub
+import helpers.IntegrationBaseSpec
+import stubs.AuthStub
 
 class RemoveAllDataISpec extends IntegrationBaseSpec {
 

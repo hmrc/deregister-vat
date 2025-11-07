@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package tests.stubs
+package stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status.{OK, UNAUTHORIZED}
 import play.api.libs.json.{JsObject, Json}
-import tests.helpers.WireMockMethods
+import helpers.WireMockMethods
 
 object AuthStub extends WireMockMethods {
 
